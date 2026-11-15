@@ -20,6 +20,9 @@ struct PopoverView: View {
             TilesView()
             MeetingCardView(controller: controller)
             HistoryRowView(controller: controller)
+            if let url = container.lastGeneration.fileURL {
+                LastGenerationRow(url: url, controller: controller)
+            }
             FileRowView(controller: controller)
             Divider().padding(.horizontal, 4)
             FooterView(footer: state.footer, controller: controller)
@@ -75,6 +78,51 @@ struct TopSlotView: View {
         case .problem(let card):
             CardView(card: card, isProblem: true, controller: controller)
         }
+    }
+}
+
+/// The audio of the last ElevenLabs read or answer, to share or save. Shown as soon as the
+/// whole generation has arrived, also while it is still playing.
+private struct LastGenerationRow: View {
+    let url: URL
+    let controller: StatusItemController
+    @Environment(AppContainer.self) private var container
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "waveform").foregroundStyle(.secondary).frame(width: 16)
+            Text("Last read")
+            if let seconds = container.lastGeneration.duration {
+                Text(Duration.seconds(seconds.rounded()).formatted(.time(pattern: .minuteSecond)))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Spacer()
+            ShareLink(item: url) {
+                Image(systemName: "square.and.arrow.up")
+                    .frame(width: 26, height: 26)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .help("Share the last read")
+            .accessibilityLabel("Share the last read")
+            Button {
+                controller.close()
+                container.lastGeneration.saveToDownloads()
+            } label: {
+                Image(systemName: "arrow.down.circle")
+                    .frame(width: 26, height: 26)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .help("Save the last read to Downloads")
+            .accessibilityLabel("Save the last read to Downloads")
+        }
+        .padding(.leading, 8)
+        .padding(.trailing, 2)
+        .frame(height: 30)
     }
 }
 

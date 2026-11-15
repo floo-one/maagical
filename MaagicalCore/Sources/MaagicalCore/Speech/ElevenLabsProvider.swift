@@ -20,6 +20,9 @@ public final class ElevenLabsProvider: SpeechProvider {
     private let baseURL: URL
     /// The ElevenLabs model for the next read (Settings > Read).
     public var model = ElevenLabsProvider.defaultModel
+    /// Called with the full 16-bit mono 24 kHz PCM of each read or answer once all of its
+    /// audio has arrived (playback may still be running). Stopped or failed streams never call it.
+    public var onGeneration: ((Data) -> Void)?
 
     public init(client: any ByteStreamClient, webSocket: any WebSocketClient = URLSessionWebSocketClient(),
                 player: any AudioPlayer, secrets: any SecretsStore,
@@ -32,7 +35,7 @@ public final class ElevenLabsProvider: SpeechProvider {
     }
 
     public func speak(_ request: SpeechRequest) -> any SpeechPlayback {
-        let playback = ElevenLabsPlayback(player: player)
+        let playback = ElevenLabsPlayback(player: player, onGeneration: onGeneration)
         guard let key = secrets.read(.elevenLabs) else {
             playback.fail(.unauthorized)
             return playback
@@ -92,7 +95,7 @@ extension ElevenLabsProvider: StreamingSpeechProvider {
     public static let chunkSchedule = [50, 90, 120, 150]
 
     public func beginStream(_ request: SpeechRequest) -> any StreamingSpeech {
-        let playback = ElevenLabsTextStream(player: player)
+        let playback = ElevenLabsTextStream(player: player, onGeneration: onGeneration)
         guard let key = secrets.read(.elevenLabs) else {
             playback.fail(.unauthorized)
             return playback
@@ -142,9 +145,12 @@ final class ElevenLabsTextStream: StreamingSpeech {
     private var receivedAudio = false
     /// Characters whose audio has arrived, from `alignment`, for resuming with Apple.
     private var alignedCharacters = 0
+    private var capture = GenerationCapture()
+    private let onGeneration: ((Data) -> Void)?
 
-    init(player: any AudioPlayer) {
+    init(player: any AudioPlayer, onGeneration: ((Data) -> Void)? = nil) {
         self.player = player
+        self.onGeneration = onGeneration
         var c: AsyncThrowingStream<SpeechEvent, Error>.Continuation!
         events = AsyncThrowingStream { c = $0 }
         continuation = c
@@ -185,6 +191,7 @@ final class ElevenLabsTextStream: StreamingSpeech {
                 }
                 guard let self, !self.cancelled else { return }
                 guard self.receivedAudio else { throw SpeechFailure.emptyResponse }
+                if let pcm = self.capture.result { self.onGeneration?(pcm) }
                 await self.player.waitUntilDone()
                 guard !self.cancelled else { return }
                 self.continuation.yield(.finished)
@@ -212,6 +219,7 @@ final class ElevenLabsTextStream: StreamingSpeech {
         let parsed = try JSONDecoder().decode(Message.self, from: Data(message.utf8))
         if let b64 = parsed.audio, let pcm = Data(base64Encoded: b64), !pcm.isEmpty {
             player.schedule(pcm16: pcm)
+            capture.append(pcm)
             if !receivedAudio {
                 receivedAudio = true
                 continuation.yield(.started)
@@ -286,9 +294,12 @@ final class ElevenLabsPlayback: SpeechPlayback {
     /// Start times (seconds into the audio) per character of the spoken suffix, from `alignment`.
     private var characterStarts: [Double] = []
     private var receivedAudio = false
+    private var capture = GenerationCapture()
+    private let onGeneration: ((Data) -> Void)?
 
-    init(player: any AudioPlayer) {
+    init(player: any AudioPlayer, onGeneration: ((Data) -> Void)? = nil) {
         self.player = player
+        self.onGeneration = onGeneration
         var c: AsyncThrowingStream<SpeechEvent, Error>.Continuation!
         events = AsyncThrowingStream { c = $0 }
         continuation = c
@@ -318,6 +329,7 @@ final class ElevenLabsPlayback: SpeechPlayback {
                     let parsed = try decoder.decode(StreamLine.self, from: data)
                     if let b64 = parsed.audio_base64, let pcm = Data(base64Encoded: b64), !pcm.isEmpty {
                         self.player.schedule(pcm16: pcm)
+                        self.capture.append(pcm)
                         if !self.receivedAudio {
                             self.receivedAudio = true
                             self.continuation.yield(.started)
@@ -330,6 +342,7 @@ final class ElevenLabsPlayback: SpeechPlayback {
                 }
                 guard !self.cancelled else { return }
                 guard self.receivedAudio else { throw SpeechFailure.emptyResponse }
+                if let pcm = self.capture.result { self.onGeneration?(pcm) }
                 await self.player.waitUntilDone()
                 guard !self.cancelled else { return }
                 self.continuation.yield(.finished)

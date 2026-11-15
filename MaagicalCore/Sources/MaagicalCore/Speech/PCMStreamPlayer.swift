@@ -15,7 +15,7 @@ import Foundation
 ///   from the audio component registrar and froze the main thread for 2 s+ at startup.
 @MainActor
 public final class PCMStreamPlayer: AudioPlayer {
-    public static let sampleRate = 24_000.0
+    public nonisolated static let sampleRate = 24_000.0
     public static let idleStopDelay: Duration = .seconds(60)
 
     /// Engine, player node and time-pitch unit, connected. Built on a background thread,
