@@ -4,6 +4,11 @@
 
 VibeFlow is now Maagical.
 
+### Added
+- **Save or share the last read.** A Last read row under History in the menu bar panel holds the
+  audio of the last ElevenLabs read or answer as an .m4a: share it (AirDrop, Messages, Mail) or
+  save it to Downloads, already while it is still playing. Reads in the Apple voice are not kept.
+
 ### Changed
 - **New name and icon.** VibeFlow is now Maagical: Maag, the author's surname, plus magical. The
   icon is a white playing card with the five voice bars as its suit, on indigo. Same keys, same
