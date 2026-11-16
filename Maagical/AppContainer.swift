@@ -52,6 +52,8 @@ final class AppContainer {
     /// The question being answered, from the release of a hold until its transcript arrives.
     @ObservationIgnored private var pendingQuestion: SessionID?
     private let elevenLabs: ElevenLabsProvider
+    /// The last ElevenLabs read or answer as a file, for the panel's share button.
+    let lastGeneration = LastVoiceGeneration()
     let catalogs: RemoteCatalogs
     let meetings: MeetingsStore
     /// The focus timer; also installs the notification delegate, so it starts with the app.
@@ -111,6 +113,7 @@ final class AppContainer {
         let elevenLabs = ElevenLabsProvider(client: stream, webSocket: MeteredWebSocketClient(URLSessionWebSocketClient(), record: meter),
                                             player: player, secrets: secrets)
         self.elevenLabs = elevenLabs
+        elevenLabs.onGeneration = { [lastGeneration] pcm in lastGeneration.store(pcm) }
         let session = ReadSession(
             accessibility: accessibility,
             clipboardSource: clipboardSource,
