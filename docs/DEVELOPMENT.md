@@ -277,7 +277,7 @@ pnpm verify                                 # astro check, build, internal link 
 
 The Website workflow (`.github/workflows/website.yml`) runs `pnpm verify` on pull requests
 that touch `website/`, and on push to main also deploys `website/dist` to GitHub Pages, built
-for `https://vibeflow.floo.one` (`SITE_URL` and `BASE_PATH` in the workflow). Locally it builds
+for `https://maagical.app` (`SITE_URL` and `BASE_PATH` in the workflow). Locally it builds
 for `https://floo-one.github.io/vibeflow/`. The version line reads `MARKETING_VERSION` from
 `project.yml`, so a release needs no website change.
 
