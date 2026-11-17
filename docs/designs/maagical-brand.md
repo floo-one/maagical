@@ -14,8 +14,8 @@ Features keep their plain names: read, smart read, dictation, meetings, focus, k
 
 Rejected: Maagic (reads as a typo of magic), Maag alone (says nothing), Maagintosh (funny once).
 
-Domain: maagical.app had no DNS records on 2026-11-06; registration status unconfirmed. The site
-stays at vibeflow.floo.one until that is settled.
+Domain: the site lives at maagical.app since 2026-11-17 (registered at Porkbun, DNS on Cloudflare).
+vibeflow.floo.one redirects there.
 
 ## In the app
 
