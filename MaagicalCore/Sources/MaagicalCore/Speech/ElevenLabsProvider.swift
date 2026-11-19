@@ -271,6 +271,9 @@ final class ElevenLabsTextStream: StreamingSpeech {
         continuation.finish()
     }
 
+    func pause() { player.pause() }
+    func resume() { player.resume() }
+
     private struct Message: Decodable {
         struct Alignment: Decodable { let chars: [String]? }
         let audio: String?
@@ -386,6 +389,9 @@ final class ElevenLabsPlayback: SpeechPlayback {
         player.stop()
         continuation.finish()
     }
+
+    func pause() { player.pause() }
+    func resume() { player.resume() }
 
     private struct Alignment: Decodable {
         let characters: [String]

@@ -45,6 +45,8 @@ public final class PCMStreamPlayer: AudioPlayer {
     private var idleStop: Task<Void, Never>?
     /// Bumped by `stop()` so completions from a stopped generation are ignored.
     private var generation = 0
+    /// Set by `pause()`: new buffers queue up instead of starting the node again.
+    private var paused = false
 
     /// Output device for the next read (Settings > Read > Speaker), nil = system output.
     /// Applied when the engine starts; a change while idle restarts it on the next read.
@@ -140,7 +142,7 @@ public final class PCMStreamPlayer: AudioPlayer {
         node.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
             Task { @MainActor in self?.bufferFinished(generation: gen) }
         }
-        if !node.isPlaying { node.play() }
+        if !node.isPlaying && !paused { node.play() }
     }
 
     private func bufferFinished(generation gen: Int) {
@@ -168,8 +170,24 @@ public final class PCMStreamPlayer: AudioPlayer {
         await withCheckedContinuation { waiters.append($0) }
     }
 
+    public func pause() {
+        paused = true
+        builtGraph?.node.pause()
+    }
+
+    public func resume() {
+        guard paused else { return }
+        paused = false
+        guard let builtGraph, pending > 0 else { return }
+        // A long pause can outlive the engine (an output device change stops it); playing a
+        // node on a stopped engine raises.
+        if !builtGraph.engine.isRunning { try? prepare() }
+        if builtGraph.engine.isRunning { builtGraph.node.play() }
+    }
+
     public func stop() {
         generation += 1
+        paused = false
         builtGraph?.node.stop()
         builtGraph?.node.reset()
         pending = 0

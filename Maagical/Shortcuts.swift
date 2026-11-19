@@ -41,6 +41,8 @@ extension KeyboardShortcuts.Name {
     /// Match Style" in Mail, Pages, Safari and TextEdit while Maagical runs. Not "pasteAnswer": an
     /// old build stored that name on Option-Minus, the push-to-talk key.
     static let pasteLastAnswer = Self("pasteLastAnswer", default: .init(.v, modifiers: pasteModifiers.union(.shift)))
+    /// Pause or resume the voice mid-read. No default: recorded in Settings > Read.
+    static let pauseReading = Self("pauseReading")
     /// Start, pause or resume focus. No default: recorded in Settings > Focus.
     static let focusToggle = Self("focusToggle")
     /// Escape cancels a running dictation. Not recordable, and registered only while a

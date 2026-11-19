@@ -230,6 +230,8 @@ enum PanelActions {
         switch action {
         case .stop: return "Stop  ⌘."
         case .readAnyway: return "Read anyway"
+        case .pause: return "Pause"
+        case .resume: return "Resume"
         case .grantAccessibility, .read(.grantAccessibility): return "Grant access"
         case .openMicrophoneSettings, .dictation(.openMicrophoneSettings): return "Open Microphone settings"
         case .read(.openKeys), .dictation(.openKeys): return "Open Settings > Accounts"
@@ -245,7 +247,7 @@ enum PanelActions {
     /// Actions that open a window or System Settings close the panel first (D13).
     static func handsOff(_ action: PanelState.Action) -> Bool {
         switch action {
-        case .stop, .readAnyway, .read(.readOriginal), .dictation(.retry), .dictation(.copyText), .dictation(.discard),
+        case .stop, .readAnyway, .pause, .resume, .read(.readOriginal), .dictation(.retry), .dictation(.copyText), .dictation(.discard),
              .dismissRenameNotice:
             return false
         default:
@@ -258,6 +260,7 @@ enum PanelActions {
         switch action {
         case .stop: container.stopAll()
         case .readAnyway: container.session.readAnyway()
+        case .pause, .resume: container.session.togglePause()
         case .grantAccessibility, .read(.grantAccessibility): NSWorkspace.shared.open(Accessibility.settingsURL)
         case .openMicrophoneSettings, .dictation(.openMicrophoneSettings): NSWorkspace.shared.open(Microphone.settingsURL)
         case .read(.openKeys), .dictation(.openKeys): container.presentSettings(tab: .accounts)

@@ -129,6 +129,22 @@ struct ElevenLabsStreamTests {
         #expect(h.player.scheduled[0].count == 480, "240 frames of Int16")
     }
 
+    // protects: the Pause shortcut / menu actually holds an ElevenLabs read (the default voice).
+    // fails_when: ElevenLabsPlayback.pause()/resume() stop forwarding to the AudioPlayer.
+    // why_new: ReadSession tests use FakePlayback, so the provider's forwarding was never exercised.
+    // seam: none (existing FakeAudioPlayer, counters only). no_claim: real AVAudioPlayerNode behavior.
+    @Test func pauseAndResumeReachThePlayer() async {
+        let h = ElevenLabsHarness()
+        h.client.lines = [ElevenLabsHarness.line(samples: 10, characters: ["H"], startTimes: [0])]
+        let playback = h.provider.speak(SpeechRequest(text: "H", voiceID: "v"))
+        playback.pause()
+        #expect(h.player.pauseCount == 1)
+        #expect(h.player.resumeCount == 0)
+        playback.resume()
+        #expect(h.player.resumeCount == 1)
+        _ = await h.collect(playback)
+    }
+
     @Test func progressOffsetsIncludeTheStartOffsetOfAResume() async {
         let h = ElevenLabsHarness()
         h.client.lines = [ElevenLabsHarness.line(samples: 10, characters: ["S", "e"], startTimes: [0, 0.1])]
@@ -301,6 +317,19 @@ struct ElevenLabsTextStreamTests {
         await settle()
         socket.drop(URLError(.networkConnectionLost))
         await #expect(throws: SpeechFailure.connectionLost(lastPlayedOffset: 3)) { for try await _ in stream.events {} }
+    }
+
+    // protects: pausing a smart read answer streamed over the socket holds its audio.
+    // fails_when: ElevenLabsTextStream.pause()/resume() stop forwarding to the AudioPlayer.
+    // why_new: SessionFakes' FakeStreamingSpeech pause/resume are no-ops; the real stream was untested.
+    // seam: none. no_claim: whether ReadSession calls pause on the streaming path.
+    @Test func pauseAndResumeReachThePlayer() async {
+        let stream = provider.beginStream(request)
+        stream.pause()
+        #expect(player.pauseCount == 1)
+        stream.resume()
+        #expect(player.resumeCount == 1)
+        stream.cancel()
     }
 
     @Test func missingKeyFailsAtOnce() async {

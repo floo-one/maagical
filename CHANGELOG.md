@@ -8,6 +8,11 @@ VibeFlow is now Maagical.
 - **Save or share the last read.** A Last read row under History in the menu bar panel holds the
   audio of the last ElevenLabs read or answer as an .m4a: share it (AirDrop, Messages, Mail) or
   save it to Downloads, already while it is still playing. Reads in the Apple voice are not kept.
+- **Pause a read.** Pause on the panel's Speaking card (or a shortcut you record in Settings >
+  Read) holds the voice mid-sentence; Resume carries on from the same spot.
+- **Music pauses while Maagical talks or listens.** Music, Spotify or a video in the browser
+  pauses when a read or a dictation starts and plays again when it ends. Only what Maagical
+  paused starts again. On by default; Settings > General turns it off.
 
 ### Changed
 - **New name and icon.** VibeFlow is now Maagical: Maag, the author's surname, plus magical. The

@@ -15,6 +15,7 @@ struct ReadPane: View {
             Section("Shortcuts") {
                 ShortcutRecorder("Read selection", name: .read)
                 ShortcutRecorder("Read clipboard", name: .readClipboard)
+                ShortcutRecorder("Pause or resume", hint: "Holds the voice mid-sentence and continues from there", name: .pauseReading)
             }
             Section {
                 VoicePicker(voiceID: $store.defaultPreset.elevenLabsVoiceID)

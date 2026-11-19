@@ -223,6 +223,7 @@ extension FeedbackReport {
             Setting("history", preferences.historyRetention.storageValue),
             Setting("dictation sounds", on(preferences.dictationSounds)),
             Setting("notch indicator", on(preferences.notchIndicator)),
+            Setting("pause media", on(preferences.pauseMedia)),
             Setting("listening style", preferences.listeningStyle.rawValue),
             Setting("color mode", preferences.colorMode.rawValue),
             Setting("world clocks", preferences.worldClocks.map(\.zoneID).joined(separator: ", ")),

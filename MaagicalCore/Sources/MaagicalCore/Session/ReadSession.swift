@@ -103,6 +103,10 @@ public final class ReadSession {
     public private(set) var status: String = "Ready"
     public private(set) var lastError: LastError?
     public private(set) var accessibilityTrusted: Bool
+    /// True while a read is held with the pause shortcut or the menu; `state` stays `.speaking`.
+    public private(set) var isPaused = false
+    /// The status line from before the pause, shown again on resume.
+    private var statusBeforePause = ""
     /// The last complete smart read result, for "Paste last smart read". Kept in memory only.
     public private(set) var lastAnswer: String?
     /// True while the status line carries a notice ("Using Apple voice", "Smart read disabled",
@@ -320,6 +324,21 @@ public final class ReadSession {
         silenceSpokenError()
         guard state != .idle else { return }
         cancel(status: "Stopped")
+    }
+
+    /// Pause shortcut and menu "Pause" / "Resume": holds the voice mid-sentence and continues
+    /// from the same spot. Only while audio plays; the read shortcut still stops a paused read.
+    public func togglePause() {
+        guard state == .speaking, let playback = current?.playback else { return }
+        isPaused.toggle()
+        if isPaused {
+            playback.pause()
+            statusBeforePause = status
+            status = "Paused"
+        } else {
+            playback.resume()
+            status = statusBeforePause
+        }
     }
 
     /// Menu action "Read original instead": plain read of the stored text with its frozen preset.
@@ -763,6 +782,7 @@ public final class ReadSession {
         let provider: any SpeechProvider = session.usingApple ? apple : elevenLabs
         let playback = provider.speak(request)
         session.playback = playback
+        isPaused = false
         state = .buffering
         if !stickyStatus { status = "Loading voice" }
         let token = session.token
@@ -806,7 +826,8 @@ public final class ReadSession {
         case .progress:
             break
         case .notice(let text):
-            status = text
+            // While paused the line keeps saying "Paused"; the notice shows on resume.
+            if isPaused { statusBeforePause = text } else { status = text }
             stickyStatus = true
         case .finished:
             finishIdle(status: "Done")
@@ -881,6 +902,7 @@ public final class ReadSession {
         session.answerTask?.cancel()
         session.playback?.cancel()
         current = nil
+        isPaused = false
     }
 
     private func formatted(_ n: Int) -> String {
