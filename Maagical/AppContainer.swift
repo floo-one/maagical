@@ -168,6 +168,7 @@ final class AppContainer {
                 return DictationSetupFactory.make(vocabulary: preferences.vocabularyTerms,
                                                   transcriptionModel: preferences.transcriptionModel,
                                                   cleanupModel: preferences.cleanupModel,
+                                                  language: preferences.dictationLanguageTag,
                                                   secrets: secrets, http: http, onDevice: onDevice, microphoneUID: microphone,
                                                   prompts: preferences.prompts)
             },
@@ -178,7 +179,7 @@ final class AppContainer {
         notch = NotchIndicator(dictation: dictation, reading: session, preferences: preferences, holdTip: holdTip,
                                level: { [recorder] in recorder.level })
         onDeviceModel = OnDeviceModelStatus(store: LiveOnDeviceModelStore())
-        onDeviceModel.prepare(language: presets.defaultPreset.languageOverride) // D9
+        onDeviceModel.prepare(language: presets.defaultPreset.languageOverride ?? preferences.dictationLanguageTag) // D9
 
         KeyboardShortcuts.onKeyUp(for: .read) { [weak self] in self?.hotkey(.read) }
         smartReadPress = PressClassifier(

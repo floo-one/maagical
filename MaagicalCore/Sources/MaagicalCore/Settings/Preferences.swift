@@ -54,6 +54,7 @@ public final class Preferences {
         static let historyRetention = "history.retention"
         static let transcriptionModel = "dictation.transcriptionModel"
         static let cleanupModel = "dictation.cleanupModel"
+        static let dictationLanguage = "dictation.language"
         static let vocabulary = "dictation.vocabulary"
         static let microphoneUID = "dictation.microphoneUID"
         static let speakerUID = "speakerUID"
@@ -130,6 +131,14 @@ public final class Preferences {
     /// Groq chat model for dictation cleanup; ModelOptions.cleanupOff turns cleanup off.
     public var cleanupModel: String {
         didSet { defaults.set(cleanupModel, forKey: Key.cleanupModel) }
+    }
+    /// The language dictation is spoken in, ModelOptions.dictationLanguageAutomatic = detect.
+    public var dictationLanguage: String {
+        didSet { defaults.set(dictationLanguage, forKey: Key.dictationLanguage) }
+    }
+    /// nil when Automatic, else the BCP-47 tag for the transcriber.
+    public var dictationLanguageTag: String? {
+        dictationLanguage == ModelOptions.dictationLanguageAutomatic ? nil : dictationLanguage
     }
     /// Names and terms dictation cleanup should spell correctly. Not in Settings yet.
     public var vocabulary: String {
@@ -229,6 +238,7 @@ public final class Preferences {
         historyRetention = defaults.string(forKey: Key.historyRetention).flatMap(HistoryRetention.init(storageValue:)) ?? .default
         transcriptionModel = defaults.string(forKey: Key.transcriptionModel) ?? ModelOptions.transcription[0].id
         cleanupModel = defaults.string(forKey: Key.cleanupModel) ?? ModelOptions.cleanup[0].id
+        dictationLanguage = defaults.string(forKey: Key.dictationLanguage) ?? ModelOptions.dictationLanguageAutomatic
         vocabulary = defaults.string(forKey: Key.vocabulary) ?? ""
         microphoneUID = defaults.string(forKey: Key.microphoneUID)
         speakerUID = defaults.string(forKey: Key.speakerUID)

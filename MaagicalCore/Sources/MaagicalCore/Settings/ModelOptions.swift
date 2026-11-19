@@ -33,6 +33,18 @@ public enum ModelOptions {
         ModelOption("whisper-large-v3-turbo", "Whisper large v3 turbo (faster)"),
     ]
 
+    /// "" = Automatic: Whisper guesses per clip, which can pick the wrong language on short
+    /// German clips and then transcribes them badly. Otherwise a BCP-47 tag.
+    public static let dictationLanguageAutomatic = ""
+    public static let dictationLanguage = [
+        ModelOption(dictationLanguageAutomatic, "Automatic"),
+        ModelOption("de-DE", "German"),
+        ModelOption("en-US", "English"),
+        ModelOption("fr-FR", "French"),
+        ModelOption("es-ES", "Spanish"),
+        ModelOption("it-IT", "Italian"),
+    ]
+
     /// "" turns cleanup off.
     public static let cleanupOff = ""
     public static let cleanup = [

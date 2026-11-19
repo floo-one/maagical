@@ -77,6 +77,9 @@ public struct DictationSetup: Sendable {
     /// nil = cleanup off: the raw transcript is pasted.
     public var cleaner: (any DictationCleaner)?
     public var vocabulary: [String]
+    /// BCP-47 language of the speech (Settings > Dictation), nil = let the transcriber detect.
+    /// A per-app language override wins over it.
+    public var language: String?
     /// Input device UID, nil = system default input (D7 resolves Automatic before this).
     public var microphoneUID: String?
     /// A status note that applies to every dictation with this setup, e.g. "Transcribed on
@@ -84,11 +87,12 @@ public struct DictationSetup: Sendable {
     public var notice: String?
 
     public init(transcriber: FallbackTranscriber, onDevice: (any Transcriber)? = nil, cleaner: (any DictationCleaner)? = nil,
-                vocabulary: [String] = [], microphoneUID: String? = nil, notice: String? = nil) {
+                vocabulary: [String] = [], language: String? = nil, microphoneUID: String? = nil, notice: String? = nil) {
         self.transcriber = transcriber
         self.onDevice = onDevice
         self.cleaner = cleaner
         self.vocabulary = vocabulary
+        self.language = language
         self.microphoneUID = microphoneUID
         self.notice = notice
     }
@@ -451,7 +455,7 @@ public final class DictationSession {
         state = .transcribing
         status = "Transcribing"
         let id = session.id
-        let language = session.preset.languageOverride
+        let language = session.preset.languageOverride ?? session.setup.language
         let vocabulary = session.setup.vocabulary
         let clock = clock
         let earlyNotes = notes

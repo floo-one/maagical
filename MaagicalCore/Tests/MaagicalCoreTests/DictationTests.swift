@@ -94,6 +94,23 @@ struct DictationFlowTests {
         #expect(h.session.lastError == nil)
     }
 
+    @Test func dictationLanguageReachesTheTranscriber() async {
+        let h = DictationHarness()
+        h.setup.language = "de-DE"
+        await h.hold()
+        await h.finish()
+        #expect(h.groq.lastLanguage == "de-DE")
+    }
+
+    @Test func perAppLanguageOverrideWinsOverDictationLanguage() async {
+        let h = DictationHarness()
+        h.setup.language = "de-DE"
+        h.presets.defaultPreset.languageOverride = "en-US"
+        await h.hold()
+        await h.finish()
+        #expect(h.groq.lastLanguage == "en-US")
+    }
+
     @Test func releasingThePushToTalkKeyTranscribesAtOnce() async {
         let h = DictationHarness()
         h.session.recordKeyDown()

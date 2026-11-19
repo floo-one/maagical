@@ -13,6 +13,7 @@ public enum DictationSetupFactory {
         vocabulary: [String],
         transcriptionModel: String = ModelOptions.transcription[0].id,
         cleanupModel: String = ModelOptions.cleanup[0].id,
+        language: String? = nil,
         secrets: any SecretsStore,
         http: any HTTPClient,
         onDevice: (any Transcriber)?,
@@ -23,7 +24,7 @@ public enum DictationSetupFactory {
         if !hasKey, let onDevice {
             return DictationSetup(
                 transcriber: FallbackTranscriber(primary: onDevice, fallback: nil, primaryName: onDeviceName),
-                onDevice: onDevice, cleaner: nil, vocabulary: vocabulary, microphoneUID: microphoneUID,
+                onDevice: onDevice, cleaner: nil, vocabulary: vocabulary, language: language, microphoneUID: microphoneUID,
                 notice: "Transcribed on device: no Groq key")
         }
         let groq = OpenAITranscriber(http: http, model: transcriptionModel, apiKey: { secrets.read(.groq) })
@@ -32,6 +33,6 @@ public enum DictationSetupFactory {
             onDevice: onDevice,
             cleaner: hasKey && cleanupModel != ModelOptions.cleanupOff
                 ? ChatCompletionsCleaner(http: http, model: cleanupModel, apiKey: { secrets.read(.groq) }, prompts: prompts) : nil,
-            vocabulary: vocabulary, microphoneUID: microphoneUID)
+            vocabulary: vocabulary, language: language, microphoneUID: microphoneUID)
     }
 }
