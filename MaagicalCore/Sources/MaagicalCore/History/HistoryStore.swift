@@ -2,7 +2,7 @@ import Foundation
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "history")
+private let log = Logger(subsystem: "one.floo.maagical", category: "history")
 
 /// One thing Maagical did for the user: a text it read aloud, a follow-up question with
 /// Claude's answer, or a transcribed file.
@@ -162,9 +162,9 @@ public final class HistoryStore {
         }
     }
 
-    /// ~/Library/Application Support/VibeFlow/history.json
+    /// ~/Library/Application Support/Maagical/history.json
     public static var defaultFileURL: URL {
-        URL.applicationSupportDirectory.appending(path: "VibeFlow/history.json")
+        AppIdentity.current.supportDirectory.appending(path: "history.json")
     }
 
     public func add(_ entry: HistoryEntry) {

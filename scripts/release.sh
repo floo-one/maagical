@@ -1,7 +1,14 @@
 #!/bin/zsh
 # Build a notarized Maagical release: Developer ID signed app, stapled, in a DMG with its
-# Sparkle update feed (appcast.xml), and with --publish also tagged and uploaded to GitHub
-# Releases, where installed copies of Maagical find it.
+# Sparkle update feed (maagical-appcast.xml), and with --publish also tagged and uploaded to
+# GitHub Releases, where installed copies of Maagical find it.
+#
+# The bridge (docs/designs/bundle-id-move.md): copies from before 1.6 run as one.floo.vibeflow
+# and read appcast.xml. The first release published as one.floo.maagical also builds the
+# bridge, the same app under the old id (Maagical-bridge.dmg), and points appcast.xml (on the
+# release and on the nightly) at it; the bridge moves each old copy over (BridgeMove). Every
+# later release carries that appcast.xml over from the release before. --bridge builds it
+# locally without publishing, for testing.
 #
 # One-time setup (see docs/DEVELOPMENT.md "Release"):
 #   xcrun notarytool store-credentials VibeFlowNotary --team-id X7UXDLS9F7
@@ -18,6 +25,7 @@
 #         scripts/release.sh --publish       same, from a clean main that matches origin, then
 #                                            tag v<version> and create the GitHub release
 #         scripts/release.sh --no-notarize   stop after the signed export (no credentials)
+#         scripts/release.sh --bridge        also build the bridge (publish decides by itself)
 #         scripts/release.sh --nightly [--publish]
 #                                            a build of origin/main for the Nightly update
 #                                            channel, uploaded to the rolling
@@ -47,11 +55,13 @@ SENTRY_PROJECT=maagical
 NOTARIZE=1
 PUBLISH=0
 NIGHTLY=0
+BRIDGE=0
 for arg in "$@"; do
   case "$arg" in
     --no-notarize) NOTARIZE=0 ;;
     --publish) PUBLISH=1 ;;
     --nightly) NIGHTLY=1 ;;
+    --bridge) BRIDGE=1 ;;
     *) print -u2 "Unknown option: $arg"; exit 2 ;;
   esac
 done
@@ -63,6 +73,11 @@ OUT="build/release"
 ARCHIVE="$OUT/Maagical.xcarchive"
 EXPORT="$OUT/export"
 APP="$EXPORT/Maagical.app"
+BRIDGE_ARCHIVE="$OUT/Maagical-bridge.xcarchive"
+BRIDGE_EXPORT="$OUT/export-bridge"
+BRIDGE_APP="$BRIDGE_EXPORT/Maagical.app"
+LEGACY_ID="one.floo.vibeflow"
+LEGACY_FEED="https://github.com/floo-one/maagical/releases/latest/download/appcast.xml"
 
 step() { print -P "%B==> $1%b"; }
 fail() { print -u2 "error: $1"; exit 1; }
@@ -160,6 +175,24 @@ step "Clean $OUT"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
+# A published release needs an appcast.xml for the copies under one.floo.vibeflow: the one
+# that points at the bridge, carried over from the last release, or a new bridge.
+CARRY=0
+if [[ $PUBLISH -eq 1 && $NIGHTLY -eq 0 ]]; then
+  step "Find the bridge for one.floo.vibeflow copies"
+  if [[ -n "${LAST_TAG:-}" ]] && gh release download "$LAST_TAG" --pattern appcast.xml --output "$OUT/appcast.xml" 2>/dev/null \
+     && grep -q 'Maagical-bridge.dmg' "$OUT/appcast.xml"; then
+    print "carried over from $LAST_TAG"
+    CARRY=1
+    BRIDGE=0
+  else
+    rm -f "$OUT/appcast.xml"
+    print "none yet: this release builds it"
+    BRIDGE=1
+  fi
+fi
+[[ $NIGHTLY -eq 0 ]] || BRIDGE=0
+
 step "Generate the Xcode project"
 xcodegen generate >/dev/null
 
@@ -185,15 +218,61 @@ if [[ $NIGHTLY -eq 1 ]]; then
     VF_BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)")
 fi
 
-step "Archive (Release)"
-xcodebuild -project Maagical.xcodeproj -scheme Maagical -configuration Release \
-  -destination 'generic/platform=macOS' \
-  -derivedDataPath build/DerivedData -archivePath "$ARCHIVE" \
-  archive -quiet "${OVERRIDES[@]}"
+# archive_and_export <archive> <export> [build settings…]: a signed Release build, exported
+# with Developer ID, its debug symbols on Sentry.
+archive_and_export() {
+  local archive=$1 export=$2; shift 2
+  step "Archive (Release${*:+, $*})"
+  xcodebuild -project Maagical.xcodeproj -scheme Maagical -configuration Release \
+    -destination 'generic/platform=macOS' \
+    -derivedDataPath build/DerivedData -archivePath "$archive" \
+    archive -quiet "$@"
 
-step "Export with Developer ID"
-xcodebuild -exportArchive -archivePath "$ARCHIVE" \
-  -exportOptionsPlist scripts/ExportOptions.plist -exportPath "$EXPORT" -quiet
+  step "Export with Developer ID"
+  xcodebuild -exportArchive -archivePath "$archive" \
+    -exportOptionsPlist scripts/ExportOptions.plist -exportPath "$export" -quiet
+
+  step "Verify the signature"
+  codesign --verify --deep --strict --verbose=2 "$export/Maagical.app"
+  codesign -dvv "$export/Maagical.app" 2>&1 | grep -E '^(Identifier=|Authority=Developer ID Application|TeamIdentifier=|Timestamp=)'
+
+  if [[ -n "$SENTRY_TOKEN" ]]; then
+    step "Upload debug symbols to Sentry"
+    SENTRY_AUTH_TOKEN="$SENTRY_TOKEN" sentry-cli debug-files upload --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" \
+      "$archive/dSYMs"
+  fi
+}
+
+# notarize_into_dmg <app> <dmg>: notarize and staple the app, put it in a signed, notarized,
+# stapled DMG, and let Gatekeeper check both.
+notarize_into_dmg() {
+  local app=$1 dmg=$2
+  step "Notarize ${dmg:t:r}"
+  local zip="$OUT/${dmg:t:r}.zip"
+  ditto -c -k --keepParent "$app" "$zip"
+  xcrun notarytool submit "$zip" "${NOTARY_AUTH[@]}" --wait
+  xcrun stapler staple "$app"
+  rm -f "$zip"
+
+  step "Build ${dmg:t}"
+  local stage="$OUT/dmg"
+  mkdir -p "$stage"
+  ditto "$app" "$stage/Maagical.app"
+  ln -s /Applications "$stage/Applications"
+  hdiutil create -volname "Maagical" -srcfolder "$stage" -ov -format UDZO -quiet "$dmg"
+  rm -rf "$stage"
+
+  step "Sign, notarize and staple ${dmg:t}"
+  codesign --sign "Developer ID Application" --timestamp "$dmg"
+  xcrun notarytool submit "$dmg" "${NOTARY_AUTH[@]}" --wait
+  xcrun stapler staple "$dmg"
+
+  step "Gatekeeper check"
+  spctl -a -vv -t exec "$app" 2>&1
+  spctl -a -vv -t open --context context:primary-signature "$dmg" 2>&1
+}
+
+archive_and_export "$ARCHIVE" "$EXPORT" "${OVERRIDES[@]}"
 
 BUILT="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist")"
@@ -202,52 +281,42 @@ EXPECTED="$VERSION"; [[ $NIGHTLY -eq 1 ]] && EXPECTED="$NIGHTLY_VERSION"
 if [[ $NIGHTLY -eq 1 ]]; then
   [[ "$BUILD" == "$NIGHTLY_BUILD" ]] || fail "built build number $BUILD is not $NIGHTLY_BUILD"
 fi
+[[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" == one.floo.maagical ]] \
+  || fail "the release is not one.floo.maagical"
 print "Maagical $VERSION ($BUILD)"
 
-step "Verify the signature"
-codesign --verify --deep --strict --verbose=2 "$APP"
-codesign -dvv "$APP" 2>&1 | grep -E '^(Authority=Developer ID Application|TeamIdentifier=|Timestamp=)'
-
-if [[ -n "$SENTRY_TOKEN" ]]; then
-  step "Upload debug symbols to Sentry"
-  SENTRY_AUTH_TOKEN="$SENTRY_TOKEN" sentry-cli debug-files upload --org "$SENTRY_ORG" --project "$SENTRY_PROJECT" \
-    "$ARCHIVE/dSYMs"
+if [[ $BRIDGE -eq 1 ]]; then
+  # Same version and build as the release: above every copy under the old id, which all
+  # came before it.
+  archive_and_export "$BRIDGE_ARCHIVE" "$BRIDGE_EXPORT" PRODUCT_BUNDLE_IDENTIFIER="$LEGACY_ID" VF_FEED_URL="$LEGACY_FEED"
+  [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$BRIDGE_APP/Contents/Info.plist")" == "$LEGACY_ID" ]] \
+    || fail "the bridge is not $LEGACY_ID"
+  [[ "$(/usr/libexec/PlistBuddy -c 'Print :SUFeedURL' "$BRIDGE_APP/Contents/Info.plist")" == "$LEGACY_FEED" ]] \
+    || fail "the bridge does not read $LEGACY_FEED"
 fi
 
 if [[ $NOTARIZE -eq 0 ]]; then
   print "Signed app at $APP (not notarized: --no-notarize)."
+  [[ $BRIDGE -eq 1 ]] && print "Bridge at $BRIDGE_APP."
   exit 0
 fi
 
-step "Notarize the app"
-ZIP="$OUT/Maagical-$VERSION.zip"
-ditto -c -k --keepParent "$APP" "$ZIP"
-xcrun notarytool submit "$ZIP" "${NOTARY_AUTH[@]}" --wait
-xcrun stapler staple "$APP"
-rm -f "$ZIP"
-
-step "Build the DMG"
 if [[ $NIGHTLY -eq 1 ]]; then DMG="$OUT/Maagical-$NIGHTLY_BUILD.dmg"; else DMG="$OUT/Maagical-$VERSION.dmg"; fi
-STAGE="$OUT/dmg"
-mkdir -p "$STAGE"
-ditto "$APP" "$STAGE/Maagical.app"
-ln -s /Applications "$STAGE/Applications"
-hdiutil create -volname "Maagical" -srcfolder "$STAGE" -ov -format UDZO -quiet "$DMG"
-rm -rf "$STAGE"
-
-step "Sign, notarize and staple the DMG"
-codesign --sign "Developer ID Application" --timestamp "$DMG"
-xcrun notarytool submit "$DMG" "${NOTARY_AUTH[@]}" --wait
-xcrun stapler staple "$DMG"
-
-step "Gatekeeper check"
-spctl -a -vv -t exec "$APP" 2>&1
-spctl -a -vv -t open --context context:primary-signature "$DMG" 2>&1
+notarize_into_dmg "$APP" "$DMG"
+BRIDGE_DMG="$OUT/Maagical-bridge.dmg"
+[[ $BRIDGE -eq 1 ]] && notarize_into_dmg "$BRIDGE_APP" "$BRIDGE_DMG"
 
 step "Sign the DMG for Sparkle and write the update feed"
 NOTES="$OUT/notes.md"
 release_notes > "$NOTES"
-APPCAST="$OUT/appcast.xml"
+APPCAST="$OUT/maagical-appcast.xml"
+if [[ $BRIDGE -eq 1 ]]; then
+  BRIDGE_NOTES="$OUT/bridge-notes.md"
+  print "Maagical moves to its new identity on this Mac. Your keys, settings and history come along." > "$BRIDGE_NOTES"
+  scripts/write-appcast.sh --url "https://github.com/floo-one/maagical/releases/download/$TAG/${BRIDGE_DMG:t}" \
+    "$BRIDGE_DMG" "$VERSION" "$BUILD" "$BRIDGE_NOTES" ${SPARKLE_KEY_FILE:+"$SPARKLE_KEY_FILE"} > "$OUT/appcast.xml"
+  xmllint --noout "$OUT/appcast.xml"
+fi
 if [[ $NIGHTLY -eq 1 ]]; then
   # Each nightly DMG keeps its own name, so the feed never points at a file that was
   # replaced under it.
@@ -274,6 +343,8 @@ if [[ $NIGHTLY -eq 1 && $PUBLISH -eq 1 ]]; then
   fi
   gh release upload nightly "$DMG#$TITLE (DMG)" --clobber
   gh release upload nightly "$APPCAST#Update feed (Sparkle, nightly)" --clobber
+  # appcast.xml on the nightly stays on the bridge for nightlies under one.floo.vibeflow
+  # (the release that built the bridge put it there).
   gh release edit nightly --title "$TITLE" --notes-file "$NOTES" --prerelease
   for old in $(gh release view nightly --json assets -q '.assets[].name' | grep -E '^(VibeFlow|Maagical)-.*\.dmg$'); do
     [[ "$old" == "${DMG:t}" ]] || gh release delete-asset nightly "$old" --yes
@@ -283,21 +354,29 @@ elif [[ $PUBLISH -eq 1 ]]; then
   step "Publish $TAG to GitHub"
   git tag -a "$TAG" -m "Maagical $VERSION"
   git push origin "$TAG"
-  # Uploaded as Maagical.dmg and appcast.xml so .../releases/latest/download/<name> always
-  # serves the newest: the README links the DMG, installed copies read the feed (SUFeedURL).
+  # Uploaded as Maagical.dmg and maagical-appcast.xml so .../releases/latest/download/<name>
+  # always serves the newest: the README links the DMG, installed copies read the feed
+  # (SUFeedURL). appcast.xml is the bridge's feed for copies under one.floo.vibeflow.
   cp "$DMG" "$OUT/Maagical.dmg"
-  # Back to Stable in the 1.5 nightlies (StableInstaller) still fetches VibeFlow.dmg from
-  # .../latest/download, so the same DMG goes up under the old name once more. Drop this
-  # with the first release after 1.6.
-  cp "$DMG" "$OUT/VibeFlow.dmg"
-  gh release create "$TAG" "$OUT/Maagical.dmg#Maagical $VERSION (DMG)" "$OUT/VibeFlow.dmg#Maagical $VERSION (DMG, old name)" \
-    "$APPCAST#Update feed (Sparkle)" \
+  ASSETS=("$OUT/Maagical.dmg#Maagical $VERSION (DMG)" "$APPCAST#Update feed (Sparkle)"
+    "$OUT/appcast.xml#Update feed for copies before 1.6 (Sparkle, bridge)")
+  if [[ $BRIDGE -eq 1 ]]; then
+    # Back to Stable in the 1.5 nightlies (StableInstaller) fetches VibeFlow.dmg and accepts
+    # only one.floo.vibeflow: the bridge.
+    cp "$BRIDGE_DMG" "$OUT/VibeFlow.dmg"
+    ASSETS+=("$BRIDGE_DMG#Maagical $VERSION, bridge for copies before 1.6 (DMG)" "$OUT/VibeFlow.dmg#Bridge (DMG, old name)")
+  fi
+  gh release create "$TAG" "${ASSETS[@]}" \
     --title "Maagical $VERSION" --notes-file "$NOTES" --verify-tag --latest
+  if [[ $BRIDGE -eq 1 ]] && gh release view nightly >/dev/null 2>&1; then
+    # Nightlies under one.floo.vibeflow read the nightly's appcast.xml: the bridge too.
+    gh release upload nightly "$OUT/appcast.xml#Update feed for nightlies before 1.6 (Sparkle, bridge)" --clobber
+  fi
   print "Published: $(gh release view "$TAG" --json url -q .url)"
 fi
 
 # The DMG is the release. A launchable Maagical left in build/ could answer to
-# one.floo.vibeflow instead of /Applications/Maagical.app; the archive stays for its dSYMs.
+# one.floo.maagical instead of /Applications/Maagical.app; the archives stay for their dSYMs.
 step "Drop the exported app"
-rm -rf "$APP"
+rm -rf "$APP" "$BRIDGE_APP"
 [[ -n "$IN_CI" ]] || "$ROOT/scripts/dev.sh" --clean || print -u2 "warning: scripts/dev.sh --clean failed"

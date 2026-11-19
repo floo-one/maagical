@@ -6,7 +6,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "file-transcription")
+private let log = Logger(subsystem: "one.floo.maagical", category: "file-transcription")
 
 /// The Transcript window (file transcription D9, canvas board 4). Brought to the front
 /// explicitly like History, since Maagical has no Dock icon.

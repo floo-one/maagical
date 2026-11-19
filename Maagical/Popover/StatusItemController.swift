@@ -4,7 +4,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "menu-bar-panel")
+private let log = Logger(subsystem: "one.floo.maagical", category: "menu-bar-panel")
 
 /// The Maagical menu bar icon and its panel (docs/designs/menu-bar-popover.md, eng review R1).
 ///
@@ -50,7 +50,7 @@ final class StatusItemController: NSObject {
         super.init()
         // An own name, so it never inherits the remembered "hidden" state of a MenuBarExtra
         // slot (those hide themselves while inactive), and always shown, like the old icon.
-        statusItem.autosaveName = "vibeflow-icon"
+        statusItem.autosaveName = "maagical-icon"
         statusItem.isVisible = true
         if let button = statusItem.button {
             button.imagePosition = .imageLeading

@@ -17,9 +17,12 @@ final class Updater: NSObject, SPUUpdaterDelegate {
     /// How long the Mac has to sit untouched before a downloaded update installs.
     static let idleBeforeInstall: TimeInterval = 5 * 60
     /// The rolling "nightly" GitHub release, a pre-release, so .../latest never serves it.
-    static let nightlyFeed = "https://github.com/floo-one/maagical/releases/download/nightly/appcast.xml"
+    /// Its appcast.xml stays on the bridge for one.floo.vibeflow copies; one.floo.maagical
+    /// reads maagical-appcast.xml (docs/designs/bundle-id-move.md).
+    static let nightlyFeed = "https://github.com/floo-one/maagical/releases/download/nightly/"
+        + (AppIdentity.current.isLegacy ? "appcast.xml" : "maagical-appcast.xml")
 
-    private let log = Logger(subsystem: "one.floo.vibeflow", category: "update")
+    private let log = Logger(subsystem: "one.floo.maagical", category: "update")
     private let isBusy: () -> Bool
     private let followsMain: () -> Bool
     private var controller: SPUStandardUpdaterController?
@@ -49,8 +52,13 @@ final class Updater: NSObject, SPUUpdaterDelegate {
     static var isNightly: Bool { BuildStamp(info: Bundle.main.infoDictionary ?? [:]) != nil }
 
     /// The newest release's DMG. Sparkle never installs an older build, so StableInstaller
-    /// installs this one to leave a nightly.
-    static let releaseDMG = URL(string: "https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg")!
+    /// installs this one to leave a nightly, and the bridge moves to it (BridgeMove). For a test
+    /// before publishing, `defaults write <bundle id> update.releaseDMG <https or file URL>`
+    /// points both at another DMG; its app must still pass the same signature check.
+    static var releaseDMG: URL {
+        UserDefaults.standard.string(forKey: "update.releaseDMG").flatMap(URL.init(string:))
+            ?? URL(string: "https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg")!
+    }
 
     var lastCheck: Date? { controller?.updater.lastUpdateCheckDate }
 

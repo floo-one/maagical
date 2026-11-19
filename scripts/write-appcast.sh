@@ -1,7 +1,8 @@
 #!/bin/zsh
 # Print the Sparkle update feed for one release. scripts/release.sh writes it to
-# build/release/appcast.xml and uploads it next to Maagical.dmg, and the release reads it from
-# https://github.com/floo-one/maagical/releases/latest/download/appcast.xml (SUFeedURL).
+# build/release/maagical-appcast.xml and uploads it next to Maagical.dmg, and the release reads
+# it from https://github.com/floo-one/maagical/releases/latest/download/maagical-appcast.xml
+# (SUFeedURL). The bridge's feed, appcast.xml, is written the same way (release.sh).
 # One item is enough: Sparkle offers it to every older version.
 #
 # Usage:  scripts/write-appcast.sh [--url <dmg-url>] <dmg> <version> <build> <notes.md> [<ed-key-file>]

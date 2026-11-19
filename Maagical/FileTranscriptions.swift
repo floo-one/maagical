@@ -5,7 +5,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "file-transcription")
+private let log = Logger(subsystem: "one.floo.maagical", category: "file-transcription")
 
 /// The app side of file transcription (docs/designs/file-transcription.md): the open panel, the
 /// options window, the running job, Keep Awake while it runs (eng review R3), the clipboard and

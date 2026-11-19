@@ -14,8 +14,10 @@
 
 set -euo pipefail
 
-PROD_ID="one.floo.vibeflow"
-DEV_ID="one.floo.vibeflow.dev"
+PROD_ID="one.floo.maagical"
+DEV_ID="one.floo.maagical.dev"
+# The ids until 1.5 (docs/designs/bundle-id-move.md); builds under them count as the release's.
+LEGACY_IDS="one.floo.vibeflow"
 PROD_APP="/Applications/Maagical.app"
 DEV_APP="$HOME/Applications/Maagical Dev.app"
 RELEASE_DMG="https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg"
@@ -92,7 +94,7 @@ kind() {
   local wt
   if [[ $1 == *.xcarchive/* ]]; then print archive; return; fi
   if [[ $2 == "$DEV_ID" ]]; then print dev-build; return; fi
-  if [[ $2 != "$PROD_ID" ]]; then print other; return; fi
+  if [[ $2 != "$PROD_ID" && $2 != $LEGACY_IDS* ]]; then print other; return; fi
   for wt in $WORKTREES; do
     if [[ $1 == "$wt"/build/* ]]; then
       if grep -qF "$DEV_ID" "$wt/project.yml" 2>/dev/null; then print stray; else print old-branch; fi
@@ -144,7 +146,7 @@ run() {
   ditto "$built" "$DEV_APP.new"
   rm -rf "$DEV_APP"
   mv "$DEV_APP.new" "$DEV_APP"
-  # Only the installed copy answers to one.floo.vibeflow.dev: the build output leaves Launch
+  # Only the installed copy answers to one.floo.maagical.dev: the build output leaves Launch
   # Services, so nothing opens it by accident.
   $LSREGISTER -u "$built" 2>/dev/null || true
   $LSREGISTER -f "$DEV_APP"

@@ -7,7 +7,7 @@ import ServiceManagement
 import OSLog
 import SwiftUI
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "shortcuts")
+private let log = Logger(subsystem: "one.floo.maagical", category: "shortcuts")
 
 /// Composition root: stores, live services, the session, global shortcuts.
 @MainActor
@@ -20,7 +20,7 @@ final class AppContainer {
     let session: ReadSession
     let dictation: DictationSession
     let onDeviceModel: OnDeviceModelStatus
-    /// Reads and answered questions, on this Mac only (Application Support/VibeFlow/history.json).
+    /// Reads and answered questions, on this Mac only (Application Support/Maagical/history.json).
     let history: HistoryStore
     /// What the paid APIs cost, per day and model (Settings > Usage); counts only, never text.
     let usage: UsageLog
@@ -84,7 +84,7 @@ final class AppContainer {
     let secureInput = SecureInputWatch()
 
     init() {
-        LegacyMigration.runIfNeeded()
+        let imported = LegacyMigration.runIfNeeded()
         ShortcutMigration.runIfNeeded()
         showsRenameNotice = RenameNotice.decideAtLaunch()
         SystemVoiceCatalog.preload()
@@ -238,6 +238,9 @@ final class AppContainer {
 
         wireFileTranscription()
         applyColorMode()
+        // Open at Login belongs to the bundle id: after the move from one.floo.vibeflow it is
+        // registered again for this one.
+        if imported && preferences.launchAtLogin { applyLaunchAtLogin() }
         refreshPermissions()
         // Every menu that opens re-checks, so a grant taken away later shows up as well (the
         // menu bar panel calls refreshPermissions itself when it opens).
@@ -409,7 +412,8 @@ final class AppContainer {
             shortcutsBlockedBy: secureInput.blockingApp,
             feedbackEnabled: FeedbackSender.isEnabled,
             updateWaiting: updateWaiting, build: build, version: version,
-            showsRenameNotice: showsRenameNotice)
+            showsRenameNotice: showsRenameNotice,
+            offersNewHome: BridgeMove.isBridge, newHomeStep: BridgeMove.shared.step)
     }
 
     /// OK on the rename card: never again, on this Mac.

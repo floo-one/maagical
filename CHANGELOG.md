@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-VibeFlow is now Maagical.
+VibeFlow is now Maagical, inside too: the app is one.floo.maagical, its data lives in
+Application Support/Maagical and its keys in the Keychain as one.floo.maagical. A copy from
+before gets one last update that moves it over in one click: keys, settings, history and the
+menu bar position come along; macOS asks once more for Accessibility and the microphone.
 
 ### Added
 - **Save or share the last read.** A Last read row under History in the menu bar panel holds the
@@ -19,10 +22,9 @@ VibeFlow is now Maagical.
 
 ### Changed
 - **New name and icon.** VibeFlow is now Maagical: Maag, the author's surname, plus magical. The
-  icon is a white playing card with the five voice bars as its suit, on indigo. Same keys, same
-  settings, same bundle id, so the installed app updates in place and keeps its Accessibility
-  grant. The DMG is now Maagical.dmg; the release also carries it as VibeFlow.dmg once more, so
-  Back to Stable in 1.5 nightlies still works.
+  icon is a white playing card with the five voice bars as its suit, on indigo. The DMG is now
+  Maagical.dmg; the release also carries the bridge as VibeFlow.dmg, so Back to Stable in 1.5
+  nightlies still works.
 - **Menu bar icon.** The waveform is now the ace as a small card with three bars cut out, so the
   menu bar and the app icon match.
 

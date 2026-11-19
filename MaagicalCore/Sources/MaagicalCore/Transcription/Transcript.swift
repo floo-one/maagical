@@ -343,7 +343,7 @@ public struct TranscriptStore: Sendable {
     public let directory: URL
 
     public static var defaultDirectory: URL {
-        URL.applicationSupportDirectory.appending(path: "VibeFlow/Transcripts")
+        AppIdentity.current.supportDirectory.appending(path: "Transcripts")
     }
 
     public init(directory: URL = TranscriptStore.defaultDirectory) {

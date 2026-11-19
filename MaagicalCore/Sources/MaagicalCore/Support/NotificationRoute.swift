@@ -11,8 +11,8 @@ public enum NotificationRoute: Equatable, Sendable {
     case openTranscript(UUID)
     case none
 
-    public static let focusStartAction = "one.floo.vibeflow.focus.start"
-    public static let transcriptCategory = "one.floo.vibeflow.transcript.ready"
+    public static let focusStartAction = "one.floo.maagical.focus.start"
+    public static let transcriptCategory = "one.floo.maagical.transcript.ready"
     public static let transcriptKey = "transcript"
 
     public static func from(category: String, action: String, userInfo: [AnyHashable: Any]) -> NotificationRoute {

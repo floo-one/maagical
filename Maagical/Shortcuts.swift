@@ -64,7 +64,7 @@ extension KeyboardShortcuts.Name {
 @MainActor
 enum ShortcutMigration {
     private static let markerKey = "migratedDictationToSlashKey"
-    private static let log = Logger(subsystem: "one.floo.vibeflow", category: "migration")
+    private static let log = Logger(subsystem: "one.floo.maagical", category: "migration")
 
     static func runIfNeeded(defaults: UserDefaults = .standard) {
         movePasteToOptionCommand(defaults: defaults)

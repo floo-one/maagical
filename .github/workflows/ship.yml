@@ -2,8 +2,9 @@ name: Ship
 
 # Builds, signs, notarizes and publishes Maagical after CI passed on a push to main:
 # - project.yml has a MARKETING_VERSION without a tag yet: the release v<version> (tag, GitHub
-#   release marked Latest, appcast.xml), then a nightly of the same commit so the Nightly
-#   channel moves past it too.
+#   release marked Latest, maagical-appcast.xml; the first one as one.floo.maagical also builds
+#   the bridge, docs/designs/bundle-id-move.md), then a nightly of the same commit so the
+#   Nightly channel moves past it too.
 # - otherwise: the nightly (rolling "nightly" pre-release), unless the commit only changes the
 #   website, is already the nightly, or main has moved on (that newer run ships instead).
 # Run it by hand (Actions > Ship > Run workflow) to rebuild the nightly of the current main.

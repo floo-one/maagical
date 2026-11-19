@@ -1,51 +1,68 @@
 import Foundation
 import KeychainAccess
+import MaagicalCore
 import OSLog
 
-/// One-time import of settings and API keys from the app's previous identity,
-/// one.floo.outflow, after the rename to VibeFlow (2026-10-01). Runs before any store is
-/// created. Idempotent: a marker in the new defaults stops it from running twice, and it
-/// never overwrites a value that already exists under the new identity.
+/// One-time import from the app's previous identity, one.floo.vibeflow (Dev:
+/// one.floo.vibeflow.dev), at the first launch as one.floo.maagical
+/// (docs/designs/bundle-id-move.md): settings, API keys, the Google sign-in and the
+/// Application Support folder. Runs before any store is created. Idempotent: a marker in the
+/// new defaults stops it from running twice, and it never overwrites what already exists under
+/// the new identity. A fresh install finds nothing and creates nothing under the old names.
 enum LegacyMigration {
-    static let legacyBundleID = "one.floo.outflow"
-    private static let markerKey = "migratedFromOutflow"
-    private static let log = Logger(subsystem: "one.floo.vibeflow", category: "migration")
+    private static let markerKey = "migratedFromVibeFlow"
+    private static let log = Logger(subsystem: "one.floo.maagical", category: "migration")
 
-    static func runIfNeeded(defaults: UserDefaults = .standard) {
-        // Only the release identity inherits from OutFlow; Maagical Dev starts clean.
-        guard Bundle.main.bundleIdentifier == "one.floo.vibeflow" else { return }
-        guard !defaults.bool(forKey: markerKey) else { return }
-        let copiedDefaults = migrateDefaults(into: defaults)
-        let copiedKeys = migrateKeychain()
-        defaults.set(true, forKey: markerKey)
-        log.notice("legacy migration: copied \(copiedDefaults, privacy: .public) settings and \(copiedKeys, privacy: .public) keys")
-    }
-
-    /// Copies presets, preferences and KeyboardShortcuts bindings. Not sandboxed, so the old
-    /// app's preferences domain is readable by name.
-    private static func migrateDefaults(into defaults: UserDefaults) -> Int {
-        guard let old = UserDefaults.standard.persistentDomain(forName: legacyBundleID) else { return 0 }
-        var copied = 0
-        for (key, value) in old where defaults.object(forKey: key) == nil && !key.hasPrefix("NS") && !key.hasPrefix("Apple") {
-            defaults.set(value, forKey: key)
-            copied += 1
+    /// True when settings came over, so the caller can restore launch at login.
+    @discardableResult
+    static func runIfNeeded(defaults: UserDefaults = .standard) -> Bool {
+        guard let bundleID = Bundle.main.bundleIdentifier, !AppIdentity.current.isLegacy,
+              !defaults.bool(forKey: markerKey) else { return false }
+        let oldID = AppIdentity.legacyBundleID + bundleID.dropFirst(AppIdentity.bundleID.count)
+        let copiedDefaults = migrateDefaults(from: oldID, into: defaults)
+        let copiedKeys = migrateKeychain(oldID: oldID, newID: bundleID)
+        var copiedFolder = false
+        do {
+            copiedFolder = try LegacyImport.copyFolder(from: AppIdentity(bundleID: oldID).supportDirectory,
+                                                       to: AppIdentity.current.supportDirectory)
+        } catch {
+            log.error("legacy migration: could not copy the data folder: \(error.localizedDescription, privacy: .public)")
         }
-        return copied
+        defaults.set(true, forKey: markerKey)
+        log.notice("legacy migration from \(oldID, privacy: .public): \(copiedDefaults, privacy: .public) settings, \(copiedKeys, privacy: .public) keys, folder \(copiedFolder ? "copied" : "not copied", privacy: .public)")
+        return copiedDefaults > 0
     }
 
-    /// Same signing team, so the old Keychain items are readable; macOS may ask once.
-    private static func migrateKeychain() -> Int {
-        let old = Keychain(service: legacyBundleID)
-        let new = Keychain(service: "one.floo.vibeflow").accessibility(.whenUnlocked)
+    /// Presets, preferences, KeyboardShortcuts bindings and the menu bar positions. Not
+    /// sandboxed, so the old app's preferences domain is readable by name.
+    private static func migrateDefaults(from oldID: String, into defaults: UserDefaults) -> Int {
+        guard let old = defaults.persistentDomain(forName: oldID) else { return 0 }
+        let copied = LegacyImport.defaults(from: old) { defaults.object(forKey: $0) != nil }
+        for (key, value) in copied { defaults.set(value, forKey: key) }
+        return copied.count
+    }
+
+    /// The bridge build hands the keys over before it opens this app (BridgeMove), so this
+    /// usually finds them in place. A copy installed by hand reads the old items instead, and
+    /// macOS asks once for each, since they belong to the old app.
+    private static func migrateKeychain(oldID: String, newID: String) -> Int {
+        let pairs = [
+            (Keychain(service: AppIdentity.legacyBundleID), Keychain(service: AppIdentity.current.keychainService).accessibility(.whenUnlocked),
+             SecretKey.allCases.filter { !$0.readsOnDemand }),
+            (Keychain(service: oldID + ".google"), Keychain(service: newID + ".google").accessibility(.whenUnlocked),
+             [SecretKey.googleRefreshToken]),
+        ]
         var copied = 0
-        for account in ["elevenlabs-api-key", "anthropic-api-key"] {
-            guard (try? new.get(account)) == nil,
-                  let value = try? old.get(account), !value.isEmpty else { continue }
-            do {
-                try new.set(value, key: account)
-                copied += 1
-            } catch {
-                log.error("legacy migration: could not copy \(account, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        for (old, new, keys) in pairs {
+            for key in keys {
+                guard (try? new.get(key.rawValue)) == nil,
+                      let value = try? old.get(key.rawValue), !value.isEmpty else { continue }
+                do {
+                    try new.set(value, key: key.rawValue)
+                    copied += 1
+                } catch {
+                    log.error("legacy migration: could not copy \(key.rawValue, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                }
             }
         }
         return copied

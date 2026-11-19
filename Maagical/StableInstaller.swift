@@ -17,18 +17,22 @@ final class StableInstaller {
     /// The step in progress, for the button and the menu item; nil when idle.
     private(set) var step: String?
 
-    /// The release's identity: our bundle id, a Developer ID certificate from team X7UXDLS9F7,
+    /// The release's identity: a bundle id, a Developer ID certificate from team X7UXDLS9F7,
     /// and a notarization ticket (release.sh staples it to the app).
-    private static let requirement = """
-        identifier "one.floo.vibeflow" and anchor apple generic \
+    private static func requirement(identifier: String) -> String {
+        """
+        identifier "\(identifier)" and anchor apple generic \
         and certificate 1[field.1.2.840.113635.100.6.2.6] \
         and certificate leaf[field.1.2.840.113635.100.6.1.13] \
         and certificate leaf[subject.OU] = "X7UXDLS9F7" and notarized
         """
+    }
 
-    private let log = Logger(subsystem: "one.floo.vibeflow", category: "update")
+    private let log = Logger(subsystem: "one.floo.maagical", category: "update")
 
     func install(preferences: Preferences) {
+        // The newest release is one.floo.maagical, which the bridge moves to instead.
+        if BridgeMove.isBridge { BridgeMove.shared.start(); return }
         guard step == nil else { return }
         Task {
             do {
@@ -52,22 +56,8 @@ final class StableInstaller {
         let work = try files.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: target, create: true)
         defer { try? files.removeItem(at: work) }
 
-        step = "Downloading the release…"
-        log.notice("back to stable: downloading \(Updater.releaseDMG.absoluteString, privacy: .public)")
-        let (download, response) = try await URLSession.shared.download(from: Updater.releaseDMG)
-        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard status == 200 else { throw Failure("GitHub answered \(status) for the release download.") }
-        let dmg = work.appending(path: "Maagical.dmg")
-        try files.moveItem(at: download, to: dmg)
-
-        step = "Checking the release…"
-        let mount = work.appending(path: "mount")
-        try await Self.exec("/usr/bin/hdiutil", "attach", dmg.path, "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", mount.path)
-        let staged = work.appending(path: "Maagical.app")
-        let copied = Result { try files.copyItem(at: mount.appending(path: "Maagical.app"), to: staged) }
-        _ = try? await Self.exec("/usr/bin/hdiutil", "detach", mount.path, "-force")
-        try copied.get()
-        try Self.verify(staged)
+        let staged = try await Self.fetchRelease(into: work, identifier: Bundle.main.bundleIdentifier ?? AppIdentity.bundleID,
+                                                 log: log) { self.step = $0 }
 
         step = "Installing…"
         preferences.updateToNewestMain = false
@@ -83,11 +73,37 @@ final class StableInstaller {
         }
     }
 
-    private static func verify(_ app: URL) throws {
+    /// Downloads the newest release's DMG into `work` and returns the Maagical.app from it,
+    /// checked to be a notarized Developer ID build with this bundle id. Shared with BridgeMove.
+    static func fetchRelease(into work: URL, identifier: String, log: Logger,
+                             step: (String) -> Void) async throws -> URL {
+        let files = FileManager.default
+        step("Downloading the release…")
+        log.notice("release download: \(Updater.releaseDMG.absoluteString, privacy: .public)")
+        let (download, response) = try await URLSession.shared.download(from: Updater.releaseDMG)
+        if let status = (response as? HTTPURLResponse)?.statusCode, status != 200 {
+            throw Failure("GitHub answered \(status) for the release download.")
+        }
+        let dmg = work.appending(path: "Maagical.dmg")
+        try files.moveItem(at: download, to: dmg)
+
+        step("Checking the release…")
+        let mount = work.appending(path: "mount")
+        try await exec("/usr/bin/hdiutil", "attach", dmg.path, "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", mount.path)
+        let staged = work.appending(path: "Maagical.app")
+        let copied = Result { try files.copyItem(at: mount.appending(path: "Maagical.app"), to: staged) }
+        _ = try? await exec("/usr/bin/hdiutil", "detach", mount.path, "-force")
+        try copied.get()
+        try verify(staged, identifier: identifier)
+        return staged
+    }
+
+    private static func verify(_ app: URL, identifier: String) throws {
         var code: SecStaticCode?
         var requirement: SecRequirement?
         guard SecStaticCodeCreateWithPath(app as CFURL, [], &code) == errSecSuccess, let code,
-              SecRequirementCreateWithString(Self.requirement as CFString, [], &requirement) == errSecSuccess, let requirement
+              SecRequirementCreateWithString(Self.requirement(identifier: identifier) as CFString, [], &requirement) == errSecSuccess,
+              let requirement
         else { throw Failure("Could not read the signature of the downloaded app.") }
         let flags = SecCSFlags(rawValue: kSecCSCheckAllArchitectures | kSecCSStrictValidate | kSecCSCheckNestedCode)
         let status = SecStaticCodeCheckValidity(code, flags, requirement)
@@ -117,7 +133,7 @@ final class StableInstaller {
         }
     }
 
-    private struct Failure: LocalizedError {
+    struct Failure: LocalizedError {
         let errorDescription: String?
         init(_ message: String) { errorDescription = message }
     }

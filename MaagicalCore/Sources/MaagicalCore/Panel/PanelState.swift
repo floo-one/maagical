@@ -56,13 +56,18 @@ public struct PanelState: Sendable, Equatable {
         public var version: String
         /// The one-time "VibeFlow is now Maagical" card, until the user presses OK (RenameNotice).
         public var showsRenameNotice: Bool
+        /// The bridge build (one.floo.vibeflow) offers the move to one.floo.maagical (BridgeMove).
+        public var offersNewHome: Bool
+        /// The move's step while it runs ("Downloading the release…"), nil before.
+        public var newHomeStep: String?
 
         public init(readState: SessionState = .idle, readStatus: String = "Ready", readError: LastError? = nil,
                     readPaused: Bool = false, dictationState: DictationState = .idle, dictationStatus: String = "Ready",
                     dictationError: DictationError? = nil, showsDictation: Bool = false,
                     accessibilityTrusted: Bool = true, microphoneDenied: Bool = false,
                     shortcutsBlockedBy: String? = nil, feedbackEnabled: Bool = true, updateWaiting: String? = nil,
-                    build: Build = .release, version: String = "1.5.0", showsRenameNotice: Bool = false) {
+                    build: Build = .release, version: String = "1.5.0", showsRenameNotice: Bool = false,
+                    offersNewHome: Bool = false, newHomeStep: String? = nil) {
             self.readState = readState
             self.readStatus = readStatus
             self.readError = readError
@@ -79,6 +84,8 @@ public struct PanelState: Sendable, Equatable {
             self.build = build
             self.version = version
             self.showsRenameNotice = showsRenameNotice
+            self.offersNewHome = offersNewHome
+            self.newHomeStep = newHomeStep
         }
     }
 
@@ -103,6 +110,8 @@ public struct PanelState: Sendable, Equatable {
         case dictation(DictationAction)
         /// OK on the rename card.
         case dismissRenameNotice
+        /// Update Now on the bridge's new home card.
+        case moveToNewHome
     }
 
     public struct Card: Sendable, Equatable {
@@ -131,6 +140,11 @@ public struct PanelState: Sendable, Equatable {
 
     static func topSlot(_ input: Input) -> TopSlot {
         if let activity = dictationActivity(input) ?? readActivity(input) { return .activity(activity) }
+        if input.offersNewHome {
+            return .problem(Card(title: "Maagical has a new home",
+                                 detail: input.newHomeStep ?? "One click moves your keys, settings and history. macOS then asks once more for Accessibility and the microphone.",
+                                 tone: .brand, actions: [.moveToNewHome], actionsEnabled: input.newHomeStep == nil, showsMeter: false))
+        }
         if !input.accessibilityTrusted {
             return .problem(Card(title: "Allow Accessibility access", detail: "Maagical needs it to read the text you select.",
                                  tone: .setup, actions: [.grantAccessibility], actionsEnabled: true, showsMeter: false))

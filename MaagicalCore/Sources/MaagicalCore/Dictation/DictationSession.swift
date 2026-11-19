@@ -2,7 +2,7 @@ import Foundation
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "dictation")
+private let log = Logger(subsystem: "one.floo.maagical", category: "dictation")
 
 // MARK: - Public surface
 

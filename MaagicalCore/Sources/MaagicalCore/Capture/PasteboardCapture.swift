@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "capture")
+private let log = Logger(subsystem: "one.floo.maagical", category: "capture")
 
 /// The Edit > Copy fallback (design: Capture step 3, decisions D9 and D10).
 ///

@@ -1,7 +1,7 @@
 import AppKit
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "media")
+private let log = Logger(subsystem: "one.floo.maagical", category: "media")
 
 /// Pauses whatever plays in Now Playing (Music, Spotify, a YouTube tab) while Maagical reads or
 /// listens, and plays it on afterwards. Only media Maagical paused itself is started again.

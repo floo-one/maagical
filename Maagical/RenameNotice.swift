@@ -1,4 +1,5 @@
 import Foundation
+import MaagicalCore
 
 /// The one-time "VibeFlow is now Maagical" card in the menu bar panel (PanelState), shown on a
 /// Mac that already has Maagical data when the first Maagical build starts, until OK is
@@ -11,7 +12,7 @@ enum RenameNotice {
     static func decideAtLaunch() -> Bool {
         let defaults = UserDefaults.standard
         if defaults.object(forKey: seenKey) != nil { return false }
-        let folder = URL.applicationSupportDirectory.appending(path: "VibeFlow")
+        let folder = AppIdentity.current.supportDirectory
         let files = FileManager.default
         let hadData = ["history.json", "history-dev.json", "usage.json", "usage-dev.json", "focus.json", "focus-dev.json"]
             .contains { files.fileExists(atPath: folder.appending(path: $0).path) }

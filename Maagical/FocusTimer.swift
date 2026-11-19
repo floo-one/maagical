@@ -4,7 +4,7 @@ import OSLog
 import UserNotifications
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "focus")
+private let log = Logger(subsystem: "one.floo.maagical", category: "focus")
 
 /// The Pomodoro timer in the app: FocusEngine's rules, FocusLog's file, a one-second ticker while a
 /// phase runs, a chime and a silent notification when one ends. Every command is saved before
@@ -143,10 +143,10 @@ final class FocusTimer {
 
 // MARK: - Notifications
 
-private let requestID = "one.floo.vibeflow.focus.phase-ended"
+private let requestID = "one.floo.maagical.focus.phase-ended"
 private let startAction = NotificationRoute.focusStartAction
-private let breakCategory = "one.floo.vibeflow.focus.break"
-private let focusCategory = "one.floo.vibeflow.focus.focus"
+private let breakCategory = "one.floo.maagical.focus.break"
+private let focusCategory = "one.floo.maagical.focus.focus"
 
 /// One silent notification at a time ("Focus done. Start break?") with a button that starts the
 /// awaited phase. The chime is the only sound. The delegate is set at launch, from
@@ -237,7 +237,7 @@ final class FocusNotifications: NSObject, UNUserNotificationCenterDelegate {
         content.title = "Transcription failed"
         content.body = "\(file): \(message)"
         content.sound = nil
-        center.add(UNNotificationRequest(identifier: "one.floo.vibeflow.transcript.failed", content: content, trigger: nil)) { error in
+        center.add(UNNotificationRequest(identifier: "one.floo.maagical.transcript.failed", content: content, trigger: nil)) { error in
             if let error { log.notice("Transcript notification not posted: \(error.localizedDescription, privacy: .public)") }
         }
     }
@@ -249,7 +249,7 @@ final class FocusNotifications: NSObject, UNUserNotificationCenterDelegate {
         content.categoryIdentifier = NotificationRoute.transcriptCategory
         content.userInfo = [NotificationRoute.transcriptKey: id.uuidString]
         content.sound = nil
-        center.add(UNNotificationRequest(identifier: "one.floo.vibeflow.transcript.\(id.uuidString)", content: content, trigger: nil)) { error in
+        center.add(UNNotificationRequest(identifier: "one.floo.maagical.transcript.\(id.uuidString)", content: content, trigger: nil)) { error in
             if let error { log.notice("Transcript notification not posted: \(error.localizedDescription, privacy: .public)") }
         }
     }

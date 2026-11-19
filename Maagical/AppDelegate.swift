@@ -9,8 +9,8 @@ import MaagicalCore
 /// Also keeps one running copy per app (SingleInstance).
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let log = Logger(subsystem: "one.floo.vibeflow", category: "accessibility")
-    private static let launchLog = Logger(subsystem: "one.floo.vibeflow", category: "launch")
+    private let log = Logger(subsystem: "one.floo.maagical", category: "accessibility")
+    private static let launchLog = Logger(subsystem: "one.floo.maagical", category: "launch")
     private var sigterm: DispatchSourceSignal?
 
     /// The newest copy wins: an older Maagical (or Maagical Dev) from any path gets SIGTERM.
@@ -48,12 +48,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Literal key: kAXTrustedCheckOptionPrompt is a global var and not Sendable under Swift 6.
         let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
         let trusted = AXIsProcessTrustedWithOptions(options)
-        // Readable with: log show --last 2m --predicate 'subsystem == "one.floo.vibeflow"'
+        // Readable with: log show --last 2m --predicate 'subsystem == "one.floo.maagical"'
         // .notice persists to disk; .info is memory-only and invisible to `log show`.
         log.notice("launch: accessibility trusted=\(trusted, privacy: .public)")
         // The Maagical icon and its panel (menu bar popover R1); a status item made before
         // launch finishes never shows up.
         if let container = Self.container { StatusItemController.install(container: container) }
+        // The bridge build asks to move to one.floo.maagical, once the menu bar icon is up.
+        if BridgeMove.isBridge {
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                BridgeMove.shared.offerAtLaunch()
+            }
+        }
     }
 
     /// Handed over by MaagicalApp.init, which owns the container.

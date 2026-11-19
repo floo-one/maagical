@@ -87,8 +87,8 @@ if let model = option("--model") { config.smartReadModel = model }
 // without the flag, the built-in defaults.
 let promptsApp = option("--prompts")
 let promptParts: PromptLibrary = switch promptsApp {
-case "dev": Preferences.prompts(in: UserDefaults(suiteName: "one.floo.vibeflow.dev") ?? .standard)
-case "prod": Preferences.prompts(in: UserDefaults(suiteName: "one.floo.vibeflow") ?? .standard)
+case "dev": Preferences.prompts(in: UserDefaults(suiteName: "one.floo.maagical.dev") ?? .standard)
+case "prod": Preferences.prompts(in: UserDefaults(suiteName: "one.floo.maagical") ?? .standard)
 default: PromptLibrary()
 }
 
@@ -98,7 +98,7 @@ func apiKey() -> String? {
     if let key = ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"], !key.isEmpty { return key }
     let process = Process()
     process.executableURL = URL(filePath: "/usr/bin/security")
-    process.arguments = ["find-generic-password", "-s", "one.floo.vibeflow", "-a", SecretKey.anthropic.rawValue, "-w"]
+    process.arguments = ["find-generic-password", "-s", AppIdentity.bundleID, "-a", SecretKey.anthropic.rawValue, "-w"]
     let pipe = Pipe()
     process.standardOutput = pipe
     process.standardError = FileHandle.nullDevice
