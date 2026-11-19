@@ -80,6 +80,8 @@ final class AppContainer {
     /// The one-time "VibeFlow is now Maagical" card in the panel (RenameNotice).
     private(set) var showsRenameNotice = false
     @ObservationIgnored private let media = MediaPause()
+    /// Another app holding secure keyboard input blocks every shortcut; the icon and panel say so.
+    let secureInput = SecureInputWatch()
 
     init() {
         LegacyMigration.runIfNeeded()
@@ -404,6 +406,7 @@ final class AppContainer {
             showsDictation: showsDictation,
             accessibilityTrusted: session.accessibilityTrusted,
             microphoneDenied: microphonePermission == .denied,
+            shortcutsBlockedBy: secureInput.blockingApp,
             feedbackEnabled: FeedbackSender.isEnabled,
             updateWaiting: updateWaiting, build: build, version: version,
             showsRenameNotice: showsRenameNotice)
@@ -522,6 +525,7 @@ final class AppContainer {
         if showsDictation, session.state == .idle, dictation.lastError != nil { return IconState.error.symbolName }
         // A file being transcribed shows in the menu bar the whole time, not only in the menu.
         if files.job.isRunning, session.state == .idle { return "ellipsis.circle" }
+        if secureInput.blockingApp != nil, session.state == .idle { return "exclamationmark.lock" }
         return session.iconState.symbolName
     }
 
