@@ -77,6 +77,7 @@ final class AppContainer {
     @ObservationIgnored private var escapeRegistered = false
     /// The one-time "VibeFlow is now Maagical" card in the panel (RenameNotice).
     private(set) var showsRenameNotice = false
+    @ObservationIgnored private let media = MediaPause()
 
     init() {
         LegacyMigration.runIfNeeded()
@@ -217,6 +218,7 @@ final class AppContainer {
         KeyboardShortcuts.onKeyUp(for: .focusToggle) { [weak self] in self?.focus.toggle() }
         KeyboardShortcuts.onKeyUp(for: .pauseReading) { [weak self] in self?.session.togglePause() }
         watchDictationForEscape()
+        watchForMediaPause()
 
         wireFileTranscription()
         applyColorMode()
@@ -467,6 +469,27 @@ final class AppContainer {
                 guard let self, self.cancelDictation() else { return }
                 log.notice("Dictation cancelled with Escape")
             }
+        }
+    }
+
+    // MARK: Pause other media
+
+    /// Re-arms on every change: other media pauses while a read or a dictation runs.
+    private func watchForMediaPause() {
+        let talking = withObservationTracking {
+            preferences.pauseMedia && isTalking
+        } onChange: { [weak self] in
+            Task { @MainActor in self?.watchForMediaPause() }
+        }
+        media.setActive(talking)
+    }
+
+    /// A read from capture to the end of its voice, or a dictation from the first recorded word
+    /// to the paste. A read waiting for "Read anyway" is not talking yet.
+    private var isTalking: Bool {
+        switch session.state {
+        case .idle, .awaitingConfirm: return dictation.state.isBusy
+        case .capturing, .transforming, .buffering, .speaking: return true
         }
     }
 

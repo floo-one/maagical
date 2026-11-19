@@ -95,16 +95,21 @@ struct PreferencesTests {
         #expect(q.microphoneUID == "usb-mic")
     }
 
+    // Extended for pauseMedia. protects: media pausing is on out of the box and an "off" survives relaunch.
+    // fails_when: the default flips, the didSet stops writing, or init reads another key.
     @Test func dictationCuesDefaultOnAndPersist() {
         let defaults = scratchDefaults()
         let p = Preferences(defaults: defaults)
         #expect(p.dictationSounds)
         #expect(p.notchIndicator)
+        #expect(p.pauseMedia)
         p.dictationSounds = false
         p.notchIndicator = false
+        p.pauseMedia = false
         let q = Preferences(defaults: defaults)
         #expect(!q.dictationSounds)
         #expect(!q.notchIndicator)
+        #expect(!q.pauseMedia)
     }
 
     @Test func listeningStyleDefaultsToDotAndPersists() {

@@ -60,6 +60,7 @@ public final class Preferences {
         static let worldClocks = "clocks.worldClocks"
         static let dictationSounds = "feel.dictationSounds"
         static let notchIndicator = "feel.notchIndicator"
+        static let pauseMedia = "feel.pauseMedia"
         static let listeningStyle = "feel.listeningStyle"
         static let colorMode = "feel.colorMode"
         static let meetingsEnabled = "meetings.enabled"
@@ -156,6 +157,10 @@ public final class Preferences {
     public var notchIndicator: Bool {
         didSet { defaults.set(notchIndicator, forKey: Key.notchIndicator) }
     }
+    /// Music and videos pause while VibeFlow reads or listens, and play on afterwards.
+    public var pauseMedia: Bool {
+        didSet { defaults.set(pauseMedia, forKey: Key.pauseMedia) }
+    }
     public var listeningStyle: ListeningStyle {
         didSet { defaults.set(listeningStyle.rawValue, forKey: Key.listeningStyle) }
     }
@@ -236,6 +241,7 @@ public final class Preferences {
             .flatMap { try? JSONDecoder().decode([WorldClock].self, from: $0) } ?? [.berlin]
         dictationSounds = defaults.object(forKey: Key.dictationSounds) as? Bool ?? true
         notchIndicator = defaults.object(forKey: Key.notchIndicator) as? Bool ?? true
+        pauseMedia = defaults.object(forKey: Key.pauseMedia) as? Bool ?? true
         listeningStyle = defaults.string(forKey: Key.listeningStyle).flatMap(ListeningStyle.init(rawValue:)) ?? .dot
         colorMode = defaults.string(forKey: Key.colorMode).flatMap(ColorMode.init(rawValue:)) ?? .system
         meetingsEnabled = defaults.object(forKey: Key.meetingsEnabled) as? Bool ?? true

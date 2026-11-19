@@ -29,6 +29,7 @@ struct GeneralPane: View {
                 }
                 .pickerStyle(.segmented)
                 .disabled(!prefs.notchIndicator)
+                Toggle("Pause music and videos while Maagical reads or listens", isOn: $prefs.pauseMedia)
             }
 
             HistorySettings()
