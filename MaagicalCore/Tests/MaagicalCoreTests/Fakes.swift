@@ -117,6 +117,8 @@ final class FakePlayback: SpeechPlayback {
     let events: AsyncThrowingStream<SpeechEvent, Error>
     private let continuation: AsyncThrowingStream<SpeechEvent, Error>.Continuation
     private(set) var cancelCount = 0
+    private(set) var pauseCount = 0
+    private(set) var resumeCount = 0
 
     init() {
         var c: AsyncThrowingStream<SpeechEvent, Error>.Continuation!
@@ -128,6 +130,8 @@ final class FakePlayback: SpeechPlayback {
     func fail(_ failure: SpeechFailure) { continuation.finish(throwing: failure) }
     func finish() { continuation.yield(.finished); continuation.finish() }
     func cancel() { cancelCount += 1; continuation.finish() }
+    func pause() { pauseCount += 1 }
+    func resume() { resumeCount += 1 }
 }
 
 @MainActor
@@ -153,6 +157,8 @@ final class FakeAudioPlayer: AudioPlayer {
     private(set) var scheduled: [Data] = []
     private(set) var rates: [Double] = []
     private(set) var stopCount = 0
+    private(set) var pauseCount = 0
+    private(set) var resumeCount = 0
     var playedSeconds: Double = 0
     private(set) var isPlaying = false
 
@@ -161,6 +167,8 @@ final class FakeAudioPlayer: AudioPlayer {
     func setRate(_ rate: Double) { rates.append(rate) }
     func waitUntilDone() async { isPlaying = false }
     func stop() { stopCount += 1; isPlaying = false; scheduled.removeAll() }
+    func pause() { pauseCount += 1 }
+    func resume() { resumeCount += 1 }
 }
 
 // MARK: - ByteStreamClient

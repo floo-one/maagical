@@ -10,6 +10,7 @@ import Foundation
 ///   Otherwise "Ready".
 /// - "Read anyway" only for a long selection read from the menu; a long selection from a
 ///   shortcut is confirmed by pressing the shortcut again, so the card only offers Stop (R4.4).
+/// - A speaking read offers Pause (Resume while paused) next to Stop; buffering only Stop.
 /// - Dictation error actions are disabled while a dictation runs (a paste owns the clipboard,
 ///   R4.2).
 /// - Footer: Send Feedback only with a Sentry DSN; an "Update to x" pill only once Sparkle has
@@ -35,6 +36,8 @@ public struct PanelState: Sendable, Equatable {
         public var readState: SessionState
         public var readStatus: String
         public var readError: LastError?
+        /// A speaking read held with Pause (ReadSession.isPaused).
+        public var readPaused: Bool
         public var dictationState: DictationState
         public var dictationStatus: String
         public var dictationError: DictationError?
@@ -52,7 +55,7 @@ public struct PanelState: Sendable, Equatable {
         public var showsRenameNotice: Bool
 
         public init(readState: SessionState = .idle, readStatus: String = "Ready", readError: LastError? = nil,
-                    dictationState: DictationState = .idle, dictationStatus: String = "Ready",
+                    readPaused: Bool = false, dictationState: DictationState = .idle, dictationStatus: String = "Ready",
                     dictationError: DictationError? = nil, showsDictation: Bool = false,
                     accessibilityTrusted: Bool = true, microphoneDenied: Bool = false,
                     feedbackEnabled: Bool = true, updateWaiting: String? = nil,
@@ -60,6 +63,7 @@ public struct PanelState: Sendable, Equatable {
             self.readState = readState
             self.readStatus = readStatus
             self.readError = readError
+            self.readPaused = readPaused
             self.dictationState = dictationState
             self.dictationStatus = dictationStatus
             self.dictationError = dictationError
@@ -87,6 +91,8 @@ public struct PanelState: Sendable, Equatable {
     public enum Action: Sendable, Equatable {
         case stop
         case readAnyway
+        case pause
+        case resume
         case grantAccessibility
         case openMicrophoneSettings
         case read(ErrorAction)
@@ -168,9 +174,13 @@ public struct PanelState: Sendable, Equatable {
         case .transforming:
             return Card(title: "Thinking", detail: input.readStatus, tone: .smart, actions: [.stop],
                         actionsEnabled: true, showsMeter: true)
-        case .buffering, .speaking:
+        case .buffering:
             return Card(title: "Speaking", detail: input.readStatus, tone: .read, actions: [.stop],
                         actionsEnabled: true, showsMeter: true)
+        case .speaking:
+            return Card(title: input.readPaused ? "Paused" : "Speaking", detail: input.readStatus, tone: .read,
+                        actions: [.stop, input.readPaused ? .resume : .pause], actionsEnabled: true,
+                        showsMeter: !input.readPaused)
         }
     }
 

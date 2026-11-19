@@ -25,7 +25,15 @@ struct PanelStateTests {
                                      dictationError: pasteFailed, accessibilityTrusted: false, microphoneDenied: true)
         guard case .activity(let card) = PanelState(input).top else { Issue.record("expected activity"); return }
         #expect(card.title == "Speaking")
-        #expect(card.actions == [.stop])
+        #expect(card.actions == [.stop, .pause])
+    }
+
+    @Test func aPausedReadOffersResumeWithoutTheMeter() {
+        let card = PanelState(.init(readState: .speaking, readStatus: "Paused", readPaused: true)).top.card
+        #expect(card?.title == "Paused")
+        #expect(card?.actions == [.stop, .resume])
+        #expect(card?.showsMeter == false)
+        #expect(PanelState(.init(readState: .buffering)).top.card?.actions == [.stop], "nothing to pause before audio")
     }
 
     @Test func dictationActivityComesBeforeARead() {

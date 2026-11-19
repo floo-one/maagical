@@ -37,6 +37,8 @@ final class FakeStreamingSpeech: StreamingSpeech {
     func fail(_ failure: SpeechFailure) { continuation.finish(throwing: failure) }
     func finish() { continuation.yield(.finished); continuation.finish() }
     func cancel() { cancelCount += 1; continuation.finish() }
+    func pause() {}
+    func resume() {}
 }
 
 @MainActor

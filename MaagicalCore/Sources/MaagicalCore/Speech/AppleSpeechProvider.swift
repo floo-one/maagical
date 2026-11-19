@@ -142,6 +142,9 @@ final class ApplePlayback: NSObject, SpeechPlayback, AVSpeechSynthesizerDelegate
         continuation.finish()
     }
 
+    func pause() { synthesizer.pauseSpeaking(at: .immediate) }
+    func resume() { synthesizer.continueSpeaking() }
+
     // Delegate callbacks are not guaranteed on the main actor; hop explicitly.
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
         Task { @MainActor in self.emit(.started) }

@@ -41,6 +41,72 @@ struct ReadFlowTests {
         #expect(h.capture.calls.count == 1, "the cancelling press did not capture again")
     }
 
+    @Test func togglePauseHoldsAndResumesTheVoice() async throws {
+        let h = SessionHarness()
+        h.session.hotkey(.read)
+        await h.settle()
+        let playback = try #require(h.elevenLabs.last)
+
+        h.session.togglePause()
+        #expect(!h.session.isPaused, "nothing to pause before audio starts")
+        #expect(playback.pauseCount == 0)
+
+        playback.emit(.started)
+        await h.settle()
+        h.session.togglePause()
+        #expect(h.session.isPaused)
+        #expect(h.session.state == .speaking)
+        #expect(h.session.status == "Paused")
+        #expect(playback.pauseCount == 1)
+
+        h.session.togglePause()
+        #expect(!h.session.isPaused)
+        #expect(h.session.status == "Speaking")
+        #expect(playback.resumeCount == 1)
+    }
+
+    @Test func readShortcutStopsAPausedRead() async throws {
+        let h = SessionHarness()
+        h.session.hotkey(.read)
+        await h.settle()
+        h.elevenLabs.last?.emit(.started)
+        await h.settle()
+        h.session.togglePause()
+
+        h.session.hotkey(.read)
+        #expect(h.session.state == .idle)
+        #expect(!h.session.isPaused)
+        #expect(h.elevenLabs.last?.cancelCount == 1)
+    }
+
+    // protects: resume brings back the status line from before the pause, including a sticky notice.
+    // fails_when: resume hard-codes "Speaking" or drops statusBeforePause (the Apple-voice notice would vanish).
+    // why_new: togglePauseHoldsAndResumesTheVoice only sees the plain "Speaking" status, which a hard-code passes.
+    // seam: none. no_claim: the panel card text.
+    @Test func resumeRestoresAStickyStatus() async throws {
+        let h = SessionHarness { try? $0.secrets.delete(.elevenLabs) }
+        h.session.hotkey(.read)
+        await h.settle()
+        let apple = try #require(h.apple.last)
+        apple.emit(.started)
+        await h.settle()
+        #expect(h.session.status == "Using Apple voice: no ElevenLabs key")
+
+        h.session.togglePause()
+        #expect(h.session.status == "Paused")
+        #expect(apple.pauseCount == 1)
+        h.session.togglePause()
+        #expect(h.session.status == "Using Apple voice: no ElevenLabs key")
+        #expect(apple.resumeCount == 1)
+
+        h.session.togglePause()
+        apple.emit(.notice("No German voice installed"))
+        await h.settle()
+        #expect(h.session.status == "Paused", "a notice while paused waits for the resume")
+        h.session.togglePause()
+        #expect(h.session.status == "No German voice installed")
+    }
+
     @Test func pressDuringCapturingCancelsAndLateCaptureResultIsDropped() async throws {
         let h = SessionHarness { $0.capture.delay = .seconds(1) }
         h.session.hotkey(.read)
@@ -276,6 +342,35 @@ struct FallbackTests {
         #expect(resume.startOffset == 21)
         #expect(resume.text == text)
         #expect(h.session.status == "Continued with Apple voice: connection lost")
+    }
+
+    // protects: a connection drop while paused hands off to Apple unpaused, and Pause then holds Apple.
+    // fails_when: startPlayback stops clearing isPaused (the card would say "Paused" over a playing
+    //   voice and the next toggle would call resume on Apple instead of pause).
+    // why_new: no test combined pause with the provider handoff. seam: none.
+    @Test func aFallbackWhilePausedStartsTheNewVoiceUnpaused() async throws {
+        let h = SessionHarness()
+        h.session.hotkey(.read)
+        await h.settle()
+        let el = try #require(h.elevenLabs.last)
+        el.emit(.started)
+        await h.settle()
+        h.session.togglePause()
+        #expect(h.session.isPaused)
+
+        el.fail(.connectionLost(lastPlayedOffset: 3))
+        await h.settle()
+        #expect(!h.session.isPaused)
+        #expect(h.session.state == .buffering)
+        #expect(h.session.status == "Continued with Apple voice: connection lost")
+
+        let apple = try #require(h.apple.last)
+        apple.emit(.started)
+        await h.settle()
+        h.session.togglePause()
+        #expect(h.session.isPaused)
+        #expect(apple.pauseCount == 1)
+        #expect(apple.resumeCount == 0)
     }
 
     @Test func unauthorizedStopsWithTheKeysAction() async throws {

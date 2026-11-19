@@ -138,6 +138,9 @@ public protocol SpeechPlayback: AnyObject {
     var events: AsyncThrowingStream<SpeechEvent, Error> { get }
     /// Stops audio and cancels any network work. Idempotent.
     func cancel()
+    /// Holds the audio where it is; network work goes on. `resume()` continues from there.
+    func pause()
+    func resume()
 }
 
 @MainActor
@@ -179,6 +182,9 @@ public protocol AudioPlayer: AnyObject {
     func waitUntilDone() async
     /// Stops immediately and drops every scheduled buffer.
     func stop()
+    /// Holds playback; buffers scheduled meanwhile wait. Cleared by `resume()` and `stop()`.
+    func pause()
+    func resume()
 }
 
 // MARK: - Network seam used by the cloud providers

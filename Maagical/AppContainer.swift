@@ -215,6 +215,7 @@ final class AppContainer {
             self?.pasteLastAnswer()
         }
         KeyboardShortcuts.onKeyUp(for: .focusToggle) { [weak self] in self?.focus.toggle() }
+        KeyboardShortcuts.onKeyUp(for: .pauseReading) { [weak self] in self?.session.togglePause() }
         watchDictationForEscape()
 
         wireFileTranscription()
@@ -379,6 +380,7 @@ final class AppContainer {
         #endif
         return PanelState.Input(
             readState: session.state, readStatus: session.status, readError: session.lastError,
+            readPaused: session.isPaused,
             dictationState: dictation.state, dictationStatus: dictation.status, dictationError: dictation.lastError,
             showsDictation: showsDictation,
             accessibilityTrusted: session.accessibilityTrusted,
