@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-REPO_SLUG="floo-one/vibeflow"
+REPO_SLUG="floo-one/maagical"
 ENV_NAME="release"
 SELF_DIR="${0:A:h}"
 # The main checkout (also when this runs from a worktree): it has Config/Google.xcconfig and
@@ -84,7 +84,7 @@ cert() {
 notary() {
   step "ASC_KEY_P8 + ASC_KEY_ID + ASC_ISSUER_ID (notarization)"
   print "   App Store Connect opens at Users and Access > Integrations > App Store Connect API."
-  print "   Team Keys > + : name \"VibeFlow notarize\", access Developer, Generate, then Download"
+  print "   Team Keys > + : name \"Maagical notarize\", access Developer, Generate, then Download"
   print "   the .p8 (Apple lets you download it only once). The Issuer ID is above the table."
   open "https://appstoreconnect.apple.com/access/integrations/api"
   local p8="$(ask "Drag AuthKey_….p8 here and press Return")"

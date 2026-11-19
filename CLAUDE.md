@@ -5,7 +5,10 @@ docs/designs/maagical-brand.md). Code, project, scheme, module (MaagicalCore), i
 Maagical. What macOS, Sparkle and the Keychain key on stays VibeFlow on purpose: the bundle ids
 (one.floo.vibeflow, .dev), the Keychain service, the log subsystem, Application Support/VibeFlow and
 ~/Library/Caches/VibeFlow, because Sparkle, TCC and StableInstaller depend on them. VF_* build
-settings, the VF Info.plist keys and vf-eval keep their two-letter prefix.
+settings, the VF Info.plist keys and vf-eval keep their two-letter prefix. The GitHub repo is
+floo-one/maagical since 2026-11-20 (was floo-one/vibeflow; GitHub redirects the old URLs, so
+installed copies with the old feed URL still update; never create a new floo-one/vibeflow repo).
+The Sentry project is `maagical` (was `vibeflow`). The local checkout folder may still be named vibeflow.
 
 Native macOS menu bar app: select text anywhere, press a global shortcut, hear it read
 aloud in a natural voice. v1 (shipped locally) is speech out; VibeFlow 2 adds FreeFlow-style
@@ -58,7 +61,7 @@ Xcode 26.6 installed and selected (2026-10-01). The .xcodeproj is generated and 
 - Website (marketing site, Astro, Node 24): lives in `website/`; verify with `cd website && pnpm verify`. Deployed to GitHub Pages by .github/workflows/website.yml (domain maagical.app; vibeflow.floo.one redirects there); docs/DEVELOPMENT.md "Website".
 - Website motion: GSAP (website/src/scripts/motion.ts registers ScrollTrigger and ScrollToPlugin once; home-motion.ts holds the hero dock, reveals and final icon). Section motion lives in each showcase component; every effect is gated by gsap.matchMedia on prefers-reduced-motion. Official GSAP agent skills are in .claude/skills/gsap-*. The in-app Browser pane pauses requestAnimationFrame while hidden, so test animation headless with gstack browse.
 - If xcodebuild fails at CodeSign with errSecInternalComponent, the login keychain is locked: run `security unlock-keychain ~/Library/Keychains/login.keychain-db` in a terminal (asks for the login password).
-- Feedback and crashes: Sentry org `floo-one`, project `vibeflow` (EU), via sentry-cocoa (Maagical/Feedback/FeedbackSender.swift, started in MaagicalApp.init, Dev too as environment `dev`). DSN committed in Config/Maagical.xcconfig (`https:/$()/…` because xcconfig treats `//` as a comment); empty DSN = Sentry off and no feedback button. release.sh uploads dSYMs with sentry-cli using the keychain item account `vibeflow`, service `sentry-auth-token`; `--publish` fails without it. Reports are built and scrubbed by MaagicalCore FeedbackReport; design and decisions in docs/designs/feedback.md.
+- Feedback and crashes: Sentry org `floo-one`, project `maagical` (EU), via sentry-cocoa (Maagical/Feedback/FeedbackSender.swift, started in MaagicalApp.init, Dev too as environment `dev`). DSN committed in Config/Maagical.xcconfig (`https:/$()/…` because xcconfig treats `//` as a comment); empty DSN = Sentry off and no feedback button. release.sh uploads dSYMs with sentry-cli using the keychain item account `vibeflow`, service `sentry-auth-token`; `--publish` fails without it. Reports are built and scrubbed by MaagicalCore FeedbackReport; design and decisions in docs/designs/feedback.md.
 - **Logs ship with Send Feedback: never log user text** (selected or dictated text, smart read answers, vocabulary, meeting titles). Maagical reading its own log gets every value in clear, even `privacy: .private`. Log statuses, providers, models, counts and durations (MaagicalCore Support/LogLine.swift); provider error bodies only as their size.
 - Read app logs with `/usr/bin/log show --last 5m --predicate 'subsystem == "one.floo.vibeflow"'` (plain `log` is a zsh builtin and silently does nothing). Use `.notice`, not `.info`, for lines that must persist.
 - Swift 6 gotcha: `kAXTrustedCheckOptionPrompt` is a non-Sendable global; use the literal key "AXTrustedCheckOptionPrompt".

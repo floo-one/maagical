@@ -16,7 +16,7 @@ checks in "Verification" pass, and the deploy workflow publishes it.
 
 | Topic | Decision |
 |---|---|
-| Location | `website/` in `floo-one/vibeflow`, its own `package.json` and lockfile. Nothing outside `website/` imports from it. |
+| Location | `website/` in `floo-one/maagical`, its own `package.json` and lockfile. Nothing outside `website/` imports from it. |
 | Framework | Astro, current stable major at execution time, static output (`output: 'static'`). No UI framework (no React/Vue/Svelte), no Tailwind. |
 | Language | TypeScript, `astro/tsconfigs/strict`. |
 | Styling | Plain CSS: one `src/styles/global.css` with design tokens as CSS variables, plus scoped `<style>` in components. |
@@ -25,9 +25,9 @@ checks in "Verification" pass, and the deploy workflow publishes it.
 | Package manager | pnpm, pinned with `"packageManager": "pnpm@<exact>"` in `website/package.json`. Exact versions for every dependency (no `^` or `~`). |
 | Node | 24 LTS: `website/.nvmrc` = `24`, `"engines": {"node": ">=24 <25"}`, CI uses `actions/setup-node` with `node-version-file: website/.nvmrc`. Locally use `/opt/homebrew/opt/node@24/bin` (the default `node` on this Mac is 26). |
 | Integrations | `@astrojs/sitemap` only. |
-| Hosting | GitHub Pages, source "GitHub Actions". Until a domain exists the site lives at `https://floo-one.github.io/vibeflow/`, so `base` is `/vibeflow`. |
+| Hosting | GitHub Pages, source "GitHub Actions". Until a domain exists the site lives at `https://floo-one.github.io/maagical/`, so `base` is `/vibeflow`. |
 | Analytics | None. |
-| Downloads | Every Download button links to `https://github.com/floo-one/vibeflow/releases/latest/download/VibeFlow.dmg`. Never a versioned URL. |
+| Downloads | Every Download button links to `https://github.com/floo-one/maagical/releases/latest/download/VibeFlow.dmg`. Never a versioned URL. |
 
 ## Before you start
 
@@ -44,7 +44,7 @@ checks in "Verification" pass, and the deploy workflow publishes it.
      "unverified app" warning; if yes, drop that entry.
    - Is there a domain yet? (If yes, see "Custom domain".)
 4. Find out the supported Macs yourself: download the latest DMG
-   (`gh release download --repo floo-one/vibeflow --pattern VibeFlow.dmg --dir <scratch>`),
+   (`gh release download --repo floo-one/maagical --pattern VibeFlow.dmg --dir <scratch>`),
    mount it, and run `lipo -archs` on `VibeFlow.app/Contents/MacOS/VibeFlow`. `arm64 x86_64`
    means "Apple silicon and Intel Macs with macOS 15 or later"; `arm64` alone means "Apple
    silicon". Put that in the FAQ "Which Macs does it run on?".
@@ -136,7 +136,7 @@ Do them in order; each ends with `pnpm check && pnpm build` passing.
 
 ### 2. Data and layout
 
-- `src/data/site.ts` exports `DMG_URL`, `REPO_URL = 'https://github.com/floo-one/vibeflow'`,
+- `src/data/site.ts` exports `DMG_URL`, `REPO_URL = 'https://github.com/floo-one/maagical'`,
   `CHANGELOG_URL = REPO_URL + '/blob/main/CHANGELOG.md'`, `PUBLISHER = 'floo.one LLC'`, and
   `VERSION`, read at build time from `../project.yml` with
   `/MARKETING_VERSION:\s*"([^"]+)"/`, using `node:fs` and
@@ -350,9 +350,9 @@ LaunchAgent runs an installed copy. Mention it in `docs/DEVELOPMENT.md` "Nightly
 ## Going live (needs the user)
 
 - **Enable Pages** (repo setting, ask first): Settings › Pages › Source "GitHub Actions", or
-  `gh api -X POST repos/floo-one/vibeflow/pages -f build_type=workflow`.
+  `gh api -X POST repos/floo-one/maagical/pages -f build_type=workflow`.
 - After the PR merges, the Website workflow deploys; confirm
-  `https://floo-one.github.io/vibeflow/` returns 200 and shows the current version.
+  `https://floo-one.github.io/maagical/` returns 200 and shows the current version.
   Merged is not live until that URL answers.
 - **Custom domain** (when there is one): add `website/public/CNAME` with the domain, set
   the workflow env `SITE_URL=https://<domain>` and `BASE_PATH=/`, add the domain in

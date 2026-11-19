@@ -22,7 +22,7 @@ jobs:
             exit 1
           fi
 
-      # Live API evals run only with VIBEFLOW_RUN_EVALS=1 plus keys; CI sets neither.
+      # Live API evals run only with MAAGICAL_RUN_EVALS=1 plus keys; CI sets neither.
       - name: Core tests
         working-directory: MaagicalCore
         run: swift test

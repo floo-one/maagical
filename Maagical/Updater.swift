@@ -17,7 +17,7 @@ final class Updater: NSObject, SPUUpdaterDelegate {
     /// How long the Mac has to sit untouched before a downloaded update installs.
     static let idleBeforeInstall: TimeInterval = 5 * 60
     /// The rolling "nightly" GitHub release, a pre-release, so .../latest never serves it.
-    static let nightlyFeed = "https://github.com/floo-one/vibeflow/releases/download/nightly/appcast.xml"
+    static let nightlyFeed = "https://github.com/floo-one/maagical/releases/download/nightly/appcast.xml"
 
     private let log = Logger(subsystem: "one.floo.vibeflow", category: "update")
     private let isBusy: () -> Bool
@@ -50,7 +50,7 @@ final class Updater: NSObject, SPUUpdaterDelegate {
 
     /// The newest release's DMG. Sparkle never installs an older build, so StableInstaller
     /// installs this one to leave a nightly.
-    static let releaseDMG = URL(string: "https://github.com/floo-one/vibeflow/releases/latest/download/Maagical.dmg")!
+    static let releaseDMG = URL(string: "https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg")!
 
     var lastCheck: Date? { controller?.updater.lastUpdateCheckDate }
 

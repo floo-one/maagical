@@ -8,12 +8,12 @@ long each answer is and how it starts, so a prompt change can be judged on the s
 cd MaagicalCore && swift run vf-eval --label baseline
 ```
 
-The key comes from `ANTHROPIC_API_KEY`, else from VibeFlow's Keychain item (macOS asks once).
+The key comes from `ANTHROPIC_API_KEY`, else from Maagical's Keychain item (macOS asks once).
 
 Options: `--label name` names the run, `--only text` runs the fixtures whose name contains it,
 `--repeat n` runs each fixture n times (the model is not deterministic), `--model id` tries
 another model, `--fixtures dir` reads fixtures from elsewhere, `--prompts dev` or `--prompts prod`
-uses the prompt edits saved in VibeFlow Dev or the release (Settings > Prompts)
+uses the prompt edits saved in Maagical Dev or the release (Settings > Prompts)
 instead of the built-in defaults. The harness covers the brief only.
 
 ## Fixtures

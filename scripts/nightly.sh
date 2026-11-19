@@ -25,10 +25,10 @@ STATE="$HOME/Library/Application Support/$LABEL"
 OLD_STATE="$HOME/Library/Caches/$LABEL"
 SRC="$STATE/src"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
-LOG="$HOME/Library/Logs/VibeFlow Nightly.log"
+LOG="$HOME/Library/Logs/Maagical Nightly.log"
 PUBLISHED="$STATE/published"
 FAILED="$STATE/failed"
-GH_REPO="floo-one/vibeflow"
+GH_REPO="floo-one/maagical"
 # This script, absolute. Inside a zsh function $0 is the function name, so read it here.
 SELF="${0:A}"
 

@@ -3,9 +3,9 @@ import Testing
 @testable import MaagicalCore
 
 /// Live-model goldens (design D5 injection, D13 quality). They call the real Anthropic API,
-/// so they run only when both VIBEFLOW_RUN_EVALS=1 and ANTHROPIC_API_KEY are set:
+/// so they run only when both MAAGICAL_RUN_EVALS=1 and ANTHROPIC_API_KEY are set:
 ///
-///   VIBEFLOW_RUN_EVALS=1 ANTHROPIC_API_KEY=... swift test --filter LiveEvalTests
+///   MAAGICAL_RUN_EVALS=1 ANTHROPIC_API_KEY=... swift test --filter LiveEvalTests
 ///
 /// Substring assertions on must-keep facts; expect an occasional rerun, the model is not deterministic.
 private let liveEvalKey: String? = ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"]
@@ -13,7 +13,7 @@ private let liveEvalKey: String? = ProcessInfo.processInfo.environment["ANTHROPI
 private func sentences(_ text: String) -> Int {
     text.split(whereSeparator: { ".?!".contains($0) }).filter { $0.trimmingCharacters(in: .whitespacesAndNewlines).count > 3 }.count
 }
-private let liveEvalsEnabled: Bool = ProcessInfo.processInfo.environment["VIBEFLOW_RUN_EVALS"] == "1" && liveEvalKey != nil
+private let liveEvalsEnabled: Bool = ProcessInfo.processInfo.environment["MAAGICAL_RUN_EVALS"] == "1" && liveEvalKey != nil
 
 @Suite("Live evals", .enabled(if: liveEvalsEnabled))
 struct LiveEvalTests {
@@ -70,7 +70,7 @@ struct LiveEvalTests {
         #expect(r.stopReason == .endTurn)
         let out = r.text.lowercased()
         #expect(out.contains("chatgpt"), "named, not spoken as: \(r.text)")
-        #expect(!out.contains("i'd") && !out.contains("i would") && !out.contains("i recommend"), "VibeFlow never speaks as the assistant: \(r.text)")
+        #expect(!out.contains("i'd") && !out.contains("i would") && !out.contains("i recommend"), "Maagical never speaks as the assistant: \(r.text)")
         #expect(out.contains("queue") || out.contains("option 2"))
         // The fixture's own digits ("15 euros", "Option 3") would satisfy a plain contains check,
         // so look only at the closing sentence.
@@ -192,10 +192,10 @@ struct LiveEvalTests {
 
 
 private let groqEvalKey: String? = ProcessInfo.processInfo.environment["GROQ_API_KEY"]
-private let groqEvalsEnabled: Bool = ProcessInfo.processInfo.environment["VIBEFLOW_RUN_EVALS"] == "1" && groqEvalKey != nil
+private let groqEvalsEnabled: Bool = ProcessInfo.processInfo.environment["MAAGICAL_RUN_EVALS"] == "1" && groqEvalKey != nil
 
 /// Dictation cleanup goldens against the live Groq default model (T4). Run with
-///   VIBEFLOW_RUN_EVALS=1 GROQ_API_KEY=... swift test --filter CleanupEvals
+///   MAAGICAL_RUN_EVALS=1 GROQ_API_KEY=... swift test --filter CleanupEvals
 @Suite("Cleanup evals", .enabled(if: groqEvalsEnabled))
 struct CleanupEvals {
     var cleaner: ChatCompletionsCleaner { ChatCompletionsCleaner(http: URLSessionHTTPClient(), apiKey: { groqEvalKey }) }

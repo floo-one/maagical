@@ -80,7 +80,7 @@ public enum AudioFileDecoder {
     /// ...cut at the quietest 200 ms in the last 30 seconds before the mark.
     public static let cutSearchWindows = 150
     /// Prefix of every temporary file, so a launch sweep can remove leftovers.
-    public static let tempPrefix = "vibeflow-file-"
+    public static let tempPrefix = "maagical-file-"
 
     static var pcmSettings: [String: Any] { [
         AVFormatIDKey: kAudioFormatLinearPCM,

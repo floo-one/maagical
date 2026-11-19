@@ -305,7 +305,7 @@ struct FocusStatsTests {
 
 @Suite("FocusLog") @MainActor
 struct FocusLogTests {
-    let folder = FileManager.default.temporaryDirectory.appending(path: "vibeflow-focus-\(UUID().uuidString)")
+    let folder = FileManager.default.temporaryDirectory.appending(path: "maagical-focus-\(UUID().uuidString)")
     var file: URL { folder.appending(path: "focus.json") }
     let t0 = Date(timeIntervalSinceReferenceDate: 800_000_000)
 

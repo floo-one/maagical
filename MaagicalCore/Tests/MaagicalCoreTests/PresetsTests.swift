@@ -4,7 +4,7 @@ import Testing
 
 /// A throwaway UserDefaults suite per test so nothing touches the real settings.
 func scratchDefaults() -> UserDefaults {
-    let name = "vibeflow-tests-\(UUID().uuidString)"
+    let name = "maagical-tests-\(UUID().uuidString)"
     let d = UserDefaults(suiteName: name)!
     d.removePersistentDomain(forName: name)
     return d
@@ -88,10 +88,10 @@ struct PreferencesTests {
         #expect(p.launchAtLogin == false)
         #expect(p.vocabularyTerms.isEmpty)
         #expect(p.microphoneUID == nil)
-        p.vocabulary = "Anna, VibeFlow"
+        p.vocabulary = "Anna, Maagical"
         p.microphoneUID = "usb-mic"
         let q = Preferences(defaults: defaults)
-        #expect(q.vocabularyTerms == ["Anna", "VibeFlow"])
+        #expect(q.vocabularyTerms == ["Anna", "Maagical"])
         #expect(q.microphoneUID == "usb-mic")
     }
 
@@ -133,7 +133,7 @@ struct PreferencesTests {
     }
 
     @Test func vocabularyAcceptsLinesAndCommas() {
-        #expect(Preferences.parseVocabulary("VibeFlow, Groq\n  Kokoro \n\n,ElevenLabs") == ["VibeFlow", "Groq", "Kokoro", "ElevenLabs"])
+        #expect(Preferences.parseVocabulary("Maagical, Groq\n  Kokoro \n\n,ElevenLabs") == ["Maagical", "Groq", "Kokoro", "ElevenLabs"])
     }
 }
 

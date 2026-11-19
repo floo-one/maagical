@@ -89,7 +89,7 @@ targets:
         # when Maagical is idle (Updater.swift). Maagical Dev never creates an updater.
         # scripts/release.sh uploads appcast.xml with every release and refuses to sign with a
         # key that does not match SUPublicEDKey (login keychain, Sparkle account "vibeflow").
-        SUFeedURL: https://github.com/floo-one/vibeflow/releases/latest/download/appcast.xml
+        SUFeedURL: https://github.com/floo-one/maagical/releases/latest/download/appcast.xml
         SUPublicEDKey: "rf85YJNkBmW+elZ2A221ehTLacC6jKKGjqVgDyQve9s="
         SUEnableAutomaticChecks: true
         SUAutomaticallyUpdate: true

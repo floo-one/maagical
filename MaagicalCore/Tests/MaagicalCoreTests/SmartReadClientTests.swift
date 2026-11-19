@@ -84,7 +84,7 @@ struct AnthropicClientTests {
         #expect(!ai.contains(SmartReadPrompts.situationRule), "an AI reply skips the situation list")
         #expect(ai.contains(SmartReadPrompts.briefOpeningRule))
         #expect(ai.contains("a reply from Claude"), "the brief relays the assistant by name")
-        #expect(plain.hasPrefix(SmartReadPrompts.identity) && ai.hasPrefix(SmartReadPrompts.identity), "VibeFlow speaks as itself")
+        #expect(plain.hasPrefix(SmartReadPrompts.identity) && ai.hasPrefix(SmartReadPrompts.identity), "Maagical speaks as itself")
         #expect(SmartReadPrompts.askSystem(language: nil).hasPrefix(SmartReadPrompts.identity), "follow-ups too")
     }
 

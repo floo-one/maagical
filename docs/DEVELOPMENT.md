@@ -72,7 +72,7 @@ qualifications, cleanup keeps numbers and names, AI replies spoken as the assist
 on request:
 
 ```bash
-VIBEFLOW_RUN_EVALS=1 ANTHROPIC_API_KEY=... swift test --filter LiveEvalTests
+MAAGICAL_RUN_EVALS=1 ANTHROPIC_API_KEY=... swift test --filter LiveEvalTests
 ```
 
 The dictation cleanup golden (a dictated question is cleaned, never answered) runs the same
@@ -104,7 +104,7 @@ It asks for the Apple Account email of the team and an app-specific password (cr
 account.apple.com > Sign-In and Security > App-Specific Passwords; the account password does
 not work). Both go into the login keychain, nothing into the repo.
 
-Crash reports and Send Feedback go to Sentry (organization `floo-one`, project `vibeflow`,
+Crash reports and Send Feedback go to Sentry (organization `floo-one`, project `maagical`,
 EU region; docs/designs/feedback.md). The app only carries the send-only DSN, committed in
 `Config/Maagical.xcconfig`. `release.sh` uploads each build's debug symbols so crash stack
 traces are readable; that needs `sentry-cli` and an organization auth token
@@ -213,7 +213,7 @@ commit out in its own worktree (`~/Library/Application Support/one.floo.vibeflow
 `scripts/release.sh --nightly --publish`: the same signed, notarized DMG, with build number
 `<CURRENT_PROJECT_VERSION>.<commits on main>` and version `<MARKETING_VERSION>-nightly.<commits on main>` (e.g. 1.4.0-nightly.71, so Sparkle never says a bare "1.4.0" on a nightly), uploaded with its feed to the rolling `nightly`
 pre-release. The Mac has to be on and logged in; it catches up after sleep. Log:
-`~/Library/Logs/VibeFlow Nightly.log`. Not in `~/Library/Caches`: macOS and cleaner apps empty
+`~/Library/Logs/Maagical Nightly.log`. Not in `~/Library/Caches`: macOS and cleaner apps empty
 it, and the job loses its own script (log full of "can't open input file"). An older install
 there is moved over by the next `--install`.
 
@@ -271,14 +271,14 @@ The marketing site is an Astro project in `website/` (its own `package.json` and
 
 ```bash
 export PATH=/opt/homebrew/opt/node@24/bin:$PATH
-cd website && pnpm install && pnpm dev      # http://localhost:4321/vibeflow/
+cd website && pnpm install && pnpm dev      # http://localhost:4321/maagical/
 pnpm verify                                 # astro check, build, internal link check
 ```
 
 The Website workflow (`.github/workflows/website.yml`) runs `pnpm verify` on pull requests
 that touch `website/`, and on push to main also deploys `website/dist` to GitHub Pages, built
 for `https://maagical.app` (`SITE_URL` and `BASE_PATH` in the workflow). Locally it builds
-for `https://floo-one.github.io/vibeflow/`. The version line reads `MARKETING_VERSION` from
+for `https://floo-one.github.io/maagical/`. The version line reads `MARKETING_VERSION` from
 `project.yml`, so a release needs no website change.
 
 `public/og.png` is a screenshot of `/og/`. After changing `src/pages/og.astro`:
@@ -286,7 +286,7 @@ for `https://floo-one.github.io/vibeflow/`. The version line reads `MARKETING_VE
 ```bash
 pnpm build && pnpm preview &
 pnpm dlx playwright@1.64.1 install chromium
-pnpm dlx playwright@1.64.1 screenshot --viewport-size=1200,630 http://localhost:4321/vibeflow/og/ public/og.png
+pnpm dlx playwright@1.64.1 screenshot --viewport-size=1200,630 http://localhost:4321/maagical/og/ public/og.png
 ```
 
 ## Clocks data

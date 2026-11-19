@@ -4,7 +4,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 const dist = path.resolve('dist');
-const base = (process.env.BASE_PATH ?? '/vibeflow').replace(/\/?$/, '/');
+const base = (process.env.BASE_PATH ?? '/maagical').replace(/\/?$/, '/');
 
 function htmlFiles(dir) {
   return readdirSync(dir).flatMap((name) => {

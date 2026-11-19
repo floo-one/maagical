@@ -369,15 +369,15 @@ struct FileTranscriptionJobReviewFixTests {
 
 @Suite("Temporary file sweep")
 struct TemporaryFileSweepTests {
-    @Test func removesOnlyVibeFlowLeftovers() throws {
+    @Test func removesOnlyMaagicalLeftovers() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vf-sweep-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        for name in ["vibeflow-file-a.wav", "vibeflow-file-b.m4a", "vibeflow-file-c.body", "someone-else.wav", "vibeflow-1.wav"] {
+        for name in ["maagical-file-a.wav", "maagical-file-b.m4a", "maagical-file-c.body", "someone-else.wav", "maagical-1.wav"] {
             try Data("x".utf8).write(to: dir.appendingPathComponent(name))
         }
         #expect(AudioFileDecoder.removeLeftovers(in: dir) == 3)
-        #expect(Set(try FileManager.default.contentsOfDirectory(atPath: dir.path)) == ["someone-else.wav", "vibeflow-1.wav"],
+        #expect(Set(try FileManager.default.contentsOfDirectory(atPath: dir.path)) == ["someone-else.wav", "maagical-1.wav"],
                 "dictation's own temp files and other apps' files are left alone")
     }
 }

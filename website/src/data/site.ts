@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-export const REPO_URL = 'https://github.com/floo-one/vibeflow';
+export const REPO_URL = 'https://github.com/floo-one/maagical';
 export const CHANGELOG_URL = REPO_URL + '/blob/main/CHANGELOG.md';
 export const DMG_URL = REPO_URL + '/releases/latest/download/Maagical.dmg';
 export const PUBLISHER = 'floo.one LLC';
@@ -23,7 +23,7 @@ function readVersion(): string {
 
 export const VERSION = readVersion();
 
-/** An internal link with the base path in front: url('meetings/') → /vibeflow/meetings/. */
+/** An internal link with the base path in front: url('meetings/') → /maagical/meetings/. */
 export function url(path = ''): string {
   const base = import.meta.env.BASE_URL.endsWith('/')
     ? import.meta.env.BASE_URL

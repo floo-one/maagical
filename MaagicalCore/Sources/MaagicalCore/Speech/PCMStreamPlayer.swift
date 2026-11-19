@@ -10,7 +10,7 @@ import Foundation
 /// - Every buffer is scheduled with a `.dataPlayedBack` completion so memory is released
 ///   and `waitUntilDone` can resolve exactly when the last sample has rendered.
 /// - The engine stays warm between reads and stops itself after 60 s idle.
-/// - The graph is built off the main thread after launch (Sentry VIBEFLOW-1): creating
+/// - The graph is built off the main thread after launch (Sentry MAAGICAL-1): creating
 ///   AVAudioPlayerNode calls AudioComponentFindNext, which waits on a synchronous XPC reply
 ///   from the audio component registrar and froze the main thread for 2 s+ at startup.
 @MainActor

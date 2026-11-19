@@ -108,7 +108,7 @@ plus a muted captioned loop.
 - GitHub Pages via one Action (or a static site on Coolify). No server, no database, no
   analytics (fits "no telemetry").
 - Download buttons point at
-  `https://github.com/floo-one/vibeflow/releases/latest/download/VibeFlow.dmg`.
+  `https://github.com/floo-one/maagical/releases/latest/download/VibeFlow.dmg`.
 - The Sparkle `appcast.xml` already ships as a release asset, so the site does not need to
   host it.
 - Needs: a domain, the og:image exported from the canvas, the demo video.

@@ -4,7 +4,7 @@ import Testing
 
 @Suite("HistoryStore") @MainActor
 struct HistoryTests {
-    let folder = FileManager.default.temporaryDirectory.appending(path: "vibeflow-history-\(UUID().uuidString)")
+    let folder = FileManager.default.temporaryDirectory.appending(path: "maagical-history-\(UUID().uuidString)")
     var file: URL { folder.appending(path: "history.json") }
     let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
 

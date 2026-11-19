@@ -27,7 +27,7 @@ public final class AppleTranscriber: Transcriber, FileTranscriber {
         guard #available(macOS 26.0, *) else {
             throw TranscriptionFailure.unavailable("On-device dictation needs macOS 26")
         }
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("vibeflow-\(UUID().uuidString).wav")
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("maagical-\(UUID().uuidString).wav")
         defer { try? FileManager.default.removeItem(at: url) }
         do {
             try audio.wav.write(to: url)
