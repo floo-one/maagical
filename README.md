@@ -39,6 +39,11 @@ The voice shortcuts are the three keys right above Option: `,` `.` `-` on a Germ
 `,` `.` `/` on a US one (the table shows the German keys). Press a read shortcut again to stop. Every shortcut can be changed in Settings, and the menu
 bar menu lists every action with its current shortcut.
 
+To pause a read mid-sentence, press Pause on the Speaking card in the menu bar panel, or record
+a Pause shortcut in Settings > Read; Resume carries on from the same spot. While Maagical reads
+or listens, music and videos that are playing pause and start again afterwards (Settings >
+General turns this off).
+
 - **Read** rewrites tables, links and Markdown for listening: a table row becomes "Campaign:
   X, Budget: Y", a link its text, a bare URL its domain.
 - **Smart read** talks like a sharp friend explaining to a curious 15-year-old, longer for

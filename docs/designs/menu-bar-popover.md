@@ -41,7 +41,7 @@ Made one at a time in /plan-design-review (2026-11-05).
 
 - **D3 One activity card (Pass 2).** The top slot is one card that follows the app's state:
   Ready (a quiet line, no card chrome) → Listening (live mic level, Stop) → Transcribing →
-  Thinking → Answering → Speaking (Stop ⌘.). A selection over the size limit shows
+  Thinking → Answering → Speaking (Stop ⌘., plus Pause, Resume while paused). A selection over the size limit shows
   "Read anyway" as the card's button. Stop never moves.
 - **D4 Problem card (Pass 2).** Problems take the same top slot: orange tint for missing
   setup, red for a failure. One sentence plus the main fix button (Grant access, Add key,
