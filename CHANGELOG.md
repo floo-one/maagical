@@ -13,6 +13,9 @@ VibeFlow is now Maagical.
 - **Music pauses while Maagical talks or listens.** Music, Spotify or a video in the browser
   pauses when a read or a dictation starts and plays again when it ends. Only what Maagical
   paused starts again. On by default; Settings > General turns it off.
+- **Says when another app blocks the shortcuts.** While an app holds secure keyboard input (a
+  password field in Chrome, sometimes stuck on after it), no shortcut reaches Maagical. The menu
+  bar icon turns into a lock and the panel names the app and how to free the keys.
 
 ### Changed
 - **New name and icon.** VibeFlow is now Maagical: Maag, the author's surname, plus magical. The

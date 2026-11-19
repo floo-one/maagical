@@ -5,7 +5,8 @@ import Foundation
 ///
 /// Rules, in order:
 /// - Top slot: anything running (dictation first, then a read) outranks every problem (D3, D4).
-///   Otherwise the most important problem shows: Accessibility, Microphone, then the last
+///   Otherwise the most important problem shows: Accessibility, another app blocking the
+///   shortcuts with secure keyboard input, Microphone, then the last
 ///   error of the session the user last used (dictation or read), then the other one (D4).
 ///   Otherwise "Ready".
 /// - "Read anyway" only for a long selection read from the menu; a long selection from a
@@ -45,6 +46,8 @@ public struct PanelState: Sendable, Equatable {
         public var showsDictation: Bool
         public var accessibilityTrusted: Bool
         public var microphoneDenied: Bool
+        /// The app holding secure keyboard input, which blocks every shortcut (SecureInputWatch).
+        public var shortcutsBlockedBy: String?
         public var feedbackEnabled: Bool
         /// The version Sparkle downloaded and holds for install, nil when none waits.
         public var updateWaiting: String?
@@ -58,7 +61,7 @@ public struct PanelState: Sendable, Equatable {
                     readPaused: Bool = false, dictationState: DictationState = .idle, dictationStatus: String = "Ready",
                     dictationError: DictationError? = nil, showsDictation: Bool = false,
                     accessibilityTrusted: Bool = true, microphoneDenied: Bool = false,
-                    feedbackEnabled: Bool = true, updateWaiting: String? = nil,
+                    shortcutsBlockedBy: String? = nil, feedbackEnabled: Bool = true, updateWaiting: String? = nil,
                     build: Build = .release, version: String = "1.5.0", showsRenameNotice: Bool = false) {
             self.readState = readState
             self.readStatus = readStatus
@@ -70,6 +73,7 @@ public struct PanelState: Sendable, Equatable {
             self.showsDictation = showsDictation
             self.accessibilityTrusted = accessibilityTrusted
             self.microphoneDenied = microphoneDenied
+            self.shortcutsBlockedBy = shortcutsBlockedBy
             self.feedbackEnabled = feedbackEnabled
             self.updateWaiting = updateWaiting
             self.build = build
@@ -130,6 +134,11 @@ public struct PanelState: Sendable, Equatable {
         if !input.accessibilityTrusted {
             return .problem(Card(title: "Allow Accessibility access", detail: "Maagical needs it to read the text you select.",
                                  tone: .setup, actions: [.grantAccessibility], actionsEnabled: true, showsMeter: false))
+        }
+        if let app = input.shortcutsBlockedBy {
+            return .problem(Card(title: "Shortcuts are blocked",
+                                 detail: "\(app) has secure keyboard input on, usually for a password field. Click out of the field or quit \(app).",
+                                 tone: .setup, actions: [], actionsEnabled: true, showsMeter: false))
         }
         if input.microphoneDenied {
             return .problem(Card(title: "Allow Microphone access", detail: "Dictation needs the microphone.",

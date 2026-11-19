@@ -20,6 +20,17 @@ struct PanelStateTests {
         #expect(PanelState(.init(readState: .speaking, readStatus: "Speaking", showsRenameNotice: true)).top.card?.title == "Speaking")
     }
 
+    @Test func secureInputNamesTheAppBlockingTheShortcuts() {
+        let card = PanelState(.init(microphoneDenied: true, shortcutsBlockedBy: "Google Chrome")).top.card
+        #expect(card?.title == "Shortcuts are blocked")
+        #expect(card?.detail.contains("Google Chrome") == true)
+        #expect(card?.tone == .setup)
+        #expect(card?.actions == [])
+        #expect(PanelState(.init(accessibilityTrusted: false, shortcutsBlockedBy: "Google Chrome")).top.card?.title
+            == "Allow Accessibility access")
+        #expect(PanelState(.init(dictationState: .recording(handsFree: false), shortcutsBlockedBy: "Google Chrome")).top.card?.title == "Listening")
+    }
+
     @Test func runningActivityOutranksEveryProblem() {
         let input = PanelState.Input(readState: .speaking, readStatus: "Speaking", readError: readFailed,
                                      dictationError: pasteFailed, accessibilityTrusted: false, microphoneDenied: true)
