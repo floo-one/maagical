@@ -21,10 +21,16 @@ struct DictationPane: View {
                 Text("Smart read, read and dictate sit on the three keys right above Option: , . - on a German keyboard, , . / on a US one. Escape cancels a dictation; nothing is pasted.")
                     .foregroundStyle(.secondary)
             }
-            Section("Transcription") {
+            Section {
+                ModelPicker(title: "Language", options: ModelOptions.dictationLanguage, selection: $prefs.dictationLanguage)
                 ModelPicker(title: "Transcription model", options: ModelOptions.transcription, selection: $prefs.transcriptionModel)
                 ModelPicker(title: "Cleanup model", options: ModelOptions.cleanup, selection: $prefs.cleanupModel)
                 PromptsLink(page: .feature(.dictation))
+            } header: {
+                Text("Transcription")
+            } footer: {
+                Text("Automatic guesses the language for each dictation and can get short ones wrong. Pick the language you speak for the most accurate text.")
+                    .foregroundStyle(.secondary)
             }
             Section("Input") {
                 DevicePicker(title: "Microphone", automaticLabel: "Automatic", devices: microphones, selection: $prefs.microphoneUID)
@@ -33,5 +39,6 @@ struct DictationPane: View {
         }
         .formStyle(.grouped)
         .task { microphones = AudioDevices.inputs() }
+        .onChange(of: prefs.dictationLanguage) { container.onDeviceModel.prepare(language: prefs.dictationLanguageTag) }
     }
 }

@@ -218,6 +218,7 @@ extension FeedbackReport {
             Setting("smart read speed", String(format: "%.2f", preferences.smartReadSpeed)),
             Setting("transcription model", preferences.transcriptionModel),
             Setting("cleanup model", preferences.cleanupModel),
+            Setting("dictation language", preferences.dictationLanguageTag ?? "automatic"),
             Setting("vocabulary", "\(preferences.vocabularyTerms.count) terms"),
             Setting("history", preferences.historyRetention.storageValue),
             Setting("dictation sounds", on(preferences.dictationSounds)),
