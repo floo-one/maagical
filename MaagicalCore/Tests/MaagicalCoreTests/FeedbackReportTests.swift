@@ -44,7 +44,7 @@ struct FeedbackReportTests {
 
     @Test func carriesReleaseMessageAndTags() {
         let r = report()
-        #expect(r.release == "vibeflow@1.4.0+3.52")
+        #expect(r.release == "maagical@1.4.0+3.52")
         #expect(r.message == "[Bug] smart read stops")
         #expect(r.tags == ["kind": "bug", "channel": "stable", "macos": "26.1", "pane": "smartRead",
                            "layout": "German", "accessibility": "granted", "microphone": "missing"])
@@ -63,7 +63,7 @@ struct FeedbackReportTests {
         let r = report(kind, logs: .lines(["Dictation finished: Pasted"]))
         #expect(r.message.hasPrefix("[\(kind.title)] "))
         #expect(r.logFile == "Dictation finished: Pasted")
-        #expect(r.render().contains("Logs (last 10 minutes, 1 lines, attached as vibeflow-log.txt)\nDictation finished: Pasted"))
+        #expect(r.render().contains("Logs (last 10 minutes, 1 lines, attached as maagical-log.txt)\nDictation finished: Pasted"))
     }
 
     @Test func thePreviewIsWhatGetsSent() throws {
@@ -106,8 +106,8 @@ struct FeedbackReportTests {
     }
 
     @Test func theHomeFolderBecomesTilde() {
-        let line = "launch: quitting older copy pid=42 at /Users/someone/Applications/VibeFlow Dev.app"
-        #expect(FeedbackReport.scrub(line, home: home) == "launch: quitting older copy pid=42 at ~/Applications/VibeFlow Dev.app")
+        let line = "launch: quitting older copy pid=42 at /Users/someone/Applications/Maagical Dev.app"
+        #expect(FeedbackReport.scrub(line, home: home) == "launch: quitting older copy pid=42 at ~/Applications/Maagical Dev.app")
     }
 
     @Test func ordinaryLogLinesSurvive() {
@@ -158,7 +158,7 @@ struct FeedbackReportSettingsTests {
     @Test func vocabularyAndCalendarsAreCountsOnly() {
         let defaults = UserDefaults(suiteName: "feedback-tests-\(UUID())")!
         let preferences = Preferences(defaults: defaults)
-        preferences.vocabulary = "Kubernetes, Floo\nVibeFlow"
+        preferences.vocabulary = "Kubernetes, Floo\nMaagical"
         preferences.meetingsCalendars = ["someone@example.com", "team@example.com"]
         let settings = FeedbackReport.settings(from: preferences)
         let text = settings.map { "\($0.name): \($0.value)" }.joined(separator: "\n")

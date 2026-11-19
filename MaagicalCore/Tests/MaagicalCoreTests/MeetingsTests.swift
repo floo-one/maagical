@@ -159,7 +159,7 @@ private func event(_ id: String = "e1", summary: String = "Standup", start: Stri
             $0.conferenceData = .init(entryPoints: [.init(entryPointType: "video", uri: "smb://share.example.com/x")])
         }) == nil)
         #expect(JoinLink.find(in: event { $0.hangoutLink = "https://meet.google.com/abc-defg-hij" })?.host() == "meet.google.com")
-        let meeting = MeetingFilter.meeting(from: event { $0.htmlLink = "vibeflow-evil://x" }, calendarID: "primary", me: me)
+        let meeting = MeetingFilter.meeting(from: event { $0.htmlLink = "maagical-evil://x" }, calendarID: "primary", me: me)
         #expect(meeting?.htmlLink == nil)
     }
 

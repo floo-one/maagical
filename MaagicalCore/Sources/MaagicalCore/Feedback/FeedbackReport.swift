@@ -88,11 +88,11 @@ public struct FeedbackReport: Equatable, Sendable {
 
     /// The attached log keeps the newest lines within this many UTF-8 bytes.
     public static let logCap = 200_000
-    public static let logFileName = "vibeflow-log.txt"
+    public static let logFileName = "maagical-log.txt"
 
     public let kind: Kind
     public let environment: Environment
-    /// "vibeflow@1.4.0+3.52"
+    /// "maagical@1.4.0+3.52"
     public let release: String
     /// "[Bug] smart read stops after…"
     public let message: String
@@ -151,7 +151,7 @@ public struct FeedbackReport: Equatable, Sendable {
 
     /// Sentry's release name, shared by feedback and crash events.
     public static func release(version: String, build: String) -> String {
-        "vibeflow@\(version)+\(build)"
+        "maagical@\(version)+\(build)"
     }
 
     /// The feedback text Sentry receives: note, build facts, settings and a line about the

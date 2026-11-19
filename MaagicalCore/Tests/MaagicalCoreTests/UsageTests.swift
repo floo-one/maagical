@@ -135,7 +135,7 @@ struct UsagePricingTests {
 
 @Suite("UsageLog") @MainActor
 struct UsageLogTests {
-    let folder = FileManager.default.temporaryDirectory.appending(path: "vibeflow-usage-\(UUID().uuidString)")
+    let folder = FileManager.default.temporaryDirectory.appending(path: "maagical-usage-\(UUID().uuidString)")
     var file: URL { folder.appending(path: "usage.json") }
     var calendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)

@@ -43,7 +43,7 @@ fi
 SPARKLE_KEY_FILE="${SPARKLE_KEY_FILE:-}"
 IN_CI="${GITHUB_ACTIONS:-}"
 SENTRY_ORG=floo-one
-SENTRY_PROJECT=vibeflow
+SENTRY_PROJECT=maagical
 NOTARIZE=1
 PUBLISH=0
 NIGHTLY=0
@@ -251,7 +251,7 @@ APPCAST="$OUT/appcast.xml"
 if [[ $NIGHTLY -eq 1 ]]; then
   # Each nightly DMG keeps its own name, so the feed never points at a file that was
   # replaced under it.
-  scripts/write-appcast.sh --url "https://github.com/floo-one/vibeflow/releases/download/nightly/${DMG:t}" \
+  scripts/write-appcast.sh --url "https://github.com/floo-one/maagical/releases/download/nightly/${DMG:t}" \
     "$DMG" "$NIGHTLY_VERSION" "$BUILD" "$NOTES" ${SPARKLE_KEY_FILE:+"$SPARKLE_KEY_FILE"} > "$APPCAST"
 else
   scripts/write-appcast.sh "$DMG" "$VERSION" "$BUILD" "$NOTES" ${SPARKLE_KEY_FILE:+"$SPARKLE_KEY_FILE"} > "$APPCAST"

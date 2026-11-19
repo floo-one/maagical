@@ -18,7 +18,7 @@ PROD_ID="one.floo.vibeflow"
 DEV_ID="one.floo.vibeflow.dev"
 PROD_APP="/Applications/Maagical.app"
 DEV_APP="$HOME/Applications/Maagical Dev.app"
-RELEASE_DMG="https://github.com/floo-one/vibeflow/releases/latest/download/Maagical.dmg"
+RELEASE_DMG="https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg"
 # Swift packages, shared by all worktrees; a cache, Xcode downloads it again when emptied.
 SHARED_PACKAGES="$HOME/Library/Caches/VibeFlow/SourcePackages"
 LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister

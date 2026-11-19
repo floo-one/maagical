@@ -18,15 +18,15 @@
 
 Follow-ups to docs/designs/file-transcription.md (eng review 2026-11-04). Build v1 first.
 
-### Open With → VibeFlow for audio and video files
+### Open With → Maagical for audio and video files
 
-**What:** Register VibeFlow for audio and movie files (role Viewer, rank Alternate in project.yml `CFBundleDocumentTypes`) and handle `application(_:open:)` by opening the Transcribe File window with that file.
+**What:** Register Maagical for audio and movie files (role Viewer, rank Alternate in project.yml `CFBundleDocumentTypes`) and handle `application(_:open:)` by opening the Transcribe File window with that file.
 
 **Why:** A second way in from Finder, without going through the menu and the open panel.
 
-**Pros:** Small; feels native. **Cons:** VibeFlow appears in every audio file's Open With list.
+**Pros:** Small; feels native. **Cons:** Maagical appears in every audio file's Open With list.
 
-**Context:** Deferred in the design until v1 has been used for a week. Rank Alternate keeps VibeFlow from becoming the default app. Start in AppDelegate and project.yml.
+**Context:** Deferred in the design until v1 has been used for a week. Rank Alternate keeps Maagical from becoming the default app. Start in AppDelegate and project.yml.
 
 **Effort:** S
 **Priority:** P3
@@ -62,13 +62,13 @@ Follow-ups to docs/designs/file-transcription.md (eng review 2026-11-04). Build 
 
 ## Interaction
 
-### Conversational mode: talk with an AI through VibeFlow and Flow
+### Conversational mode: talk with an AI through Maagical and Flow
 
 **Status:** designed 2026-10-01 in docs/designs/vibeflow-2-dictation-conversation.md (dictation plus conversation in one app). Milestone 1 (dictation) passed eng review 2026-10-02; milestone 2 (conversation) still needs its own eng review after a week of dictation use. Revised 2026-10-21: level one is now "hold the smart read key to ask a follow-up", planned and eng-reviewed in docs/designs/smart-read-follow-up.md. Level one shipped 2026-10-28 in 1.1.0: hold Option + , to ask, streamed answers, ten turns of context, History. Still open from the October design: typed questions, a transcript panel, reply drafting.
 
-**What:** A flowing back-and-forth where VibeFlow speaks an AI reply, you answer by voice (Wispr Flow) or by selecting text, and the conversation keeps context across turns: follow-up questions about what was just read, "more detail", "read the original", "what should I reply".
+**What:** A flowing back-and-forth where Maagical speaks an AI reply, you answer by voice (Wispr Flow) or by selecting text, and the conversation keeps context across turns: follow-up questions about what was just read, "more detail", "read the original", "what should I reply".
 
-**Why:** Florian after the first working build (2026-10-01): "a more communicative and flowy way of interacting with an AI using this software". Smart read is one-shot; this makes VibeFlow the voice of an assistant rather than a reader.
+**Why:** Florian after the first working build (2026-10-01): "a more communicative and flowy way of interacting with an AI using this software". Smart read is one-shot; this makes Maagical the voice of an assistant rather than a reader.
 
 **Context:** Builds on the smart read pipeline (AnthropicClient, guarded prompts) and the Codex "depth dial" idea in docs/designs/vibeflow-v1.md. Open questions to settle in /office-hours: where the conversation state lives, how a turn starts (hotkey, hold-to-talk, auto after Flow dictation), how to interrupt mid-answer, and whether Flow can be detected or the mic is read directly. Start with a design session, not code.
 
@@ -112,11 +112,11 @@ Follow-ups to docs/designs/file-transcription.md (eng review 2026-11-04). Build 
 **Priority:** P3
 **Depends on:** upcoming meetings shipped.
 
-### Focus timer extras only VibeFlow can do
+### Focus timer extras only Maagical can do
 
-**What:** Build on the focus timer: sessions that end before your next meeting (MeetingsStore), the VibeFlow voice announcing focus and break ends, focus progress in the notch (NotchIndicator), and a dictated session title.
+**What:** Build on the focus timer: sessions that end before your next meeting (MeetingsStore), the Maagical voice announcing focus and break ends, focus progress in the notch (NotchIndicator), and a dictated session title.
 
-**Why:** Parked on 2026-11-02 when the focus timer was designed as a plain Flow clone ("doesnt have to be super special for the start"). Each extra reuses something only VibeFlow has.
+**Why:** Parked on 2026-11-02 when the focus timer was designed as a plain Flow clone ("doesnt have to be super special for the start"). Each extra reuses something only Maagical has.
 
 **Context:** docs/designs/focus-timer.md, section "What Makes This Cool". Start with meeting-aware sessions, because no other timer has them. FocusEngine takes `now` and a preset, so a meeting-shortened block is one more input.
 
@@ -142,7 +142,7 @@ Follow-ups to docs/designs/file-transcription.md (eng review 2026-11-04). Build 
 
 ### Last question and answer in the menu, with Copy answer
 
-**What:** Two menu lines with the last spoken question and VibeFlow's answer, plus a Copy answer button.
+**What:** Two menu lines with the last spoken question and Maagical's answer, plus a Copy answer button.
 
 **Why:** Commands, numbers and names in a spoken answer can't be pasted. Deferred in the follow-up eng review (D2, 2026-10-21).
 
@@ -207,7 +207,7 @@ Follow-ups to docs/designs/file-transcription.md (eng review 2026-11-04). Build 
 
 **What:** Sign with a Developer ID, notarize, attach a DMG to GitHub Releases, then publish a Homebrew cask.
 
-**Why:** Without it, only people who can build from source can run VibeFlow, and Homebrew casks now require notarized apps.
+**Why:** Without it, only people who can build from source can run Maagical, and Homebrew casks now require notarized apps.
 
 **Context:** Needs the paid Apple Developer Program ($99/year). Deferred until people beyond friends want to run it (docs/designs/vibeflow-github-v1.md).
 
@@ -292,11 +292,11 @@ Follow-ups from the /design-review of docs/designs/website-demo/showcase.html (2
 
 ### Suggest context learned from history
 
-**What:** VibeFlow proposes additions to Context (About you, Terms and people, per-app rules) from what you read, ask and dictate, for example a name it keeps hearing or an app whose briefs you always follow up the same way. Each suggestion waits for your approval in the Context window; nothing is added on its own.
+**What:** Maagical proposes additions to Context (About you, Terms and people, per-app rules) from what you read, ask and dictate, for example a name it keeps hearing or an app whose briefs you always follow up the same way. Each suggestion waits for your approval in the Context window; nothing is added on its own.
 
 **Why:** Context only helps if it is filled in, and most people never write a profile or a term list by hand.
 
-**Context:** Asked for on 2026-11-05 when the Context window was built (PR floo-one/vibeflow#43); deliberately left for later. The suggestions have to be computed from History on the Mac and must never reach the logs (CLAUDE.md: never log user text), so any model call that finds them needs the same guard as smart read. Start from the History entries (text, question, source app).
+**Context:** Asked for on 2026-11-05 when the Context window was built (PR floo-one/maagical#43); deliberately left for later. The suggestions have to be computed from History on the Mac and must never reach the logs (CLAUDE.md: never log user text), so any model call that finds them needs the same guard as smart read. Start from the History entries (text, question, source app).
 
 **Effort:** M
 **Priority:** P3

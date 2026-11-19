@@ -29,7 +29,7 @@ function apiKey() {
     return execFileSync('security', ['find-generic-password', '-s', 'one.floo.vibeflow', '-a', 'elevenlabs-api-key', '-w'],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 60_000 }).trim();
   } catch {
-    console.error('No ElevenLabs key: set ELEVENLABS_API_KEY or allow access to the VibeFlow Keychain item.');
+    console.error('No ElevenLabs key: set ELEVENLABS_API_KEY or allow access to the Maagical Keychain item.');
     process.exit(1);
   }
 }

@@ -46,7 +46,7 @@ in place, so the bundle id and signature stay the same and the grants survive.
 - Add the `Sparkle` SPM package. One `SPUStandardUpdaterController`, created only in
   Release (`#if !DEBUG`); Dev never checks for updates.
 - Info.plist (Release only): `SUFeedURL =
-  https://github.com/floo-one/vibeflow/releases/latest/download/appcast.xml`,
+  https://github.com/floo-one/maagical/releases/latest/download/appcast.xml`,
   `SUPublicEDKey`, `SUEnableAutomaticChecks = YES`, `SUAutomaticallyUpdate = YES`
   (download in the background, install on quit or next launch, no prompt),
   `SUScheduledCheckInterval = 21600` (6 h).

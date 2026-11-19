@@ -166,7 +166,7 @@ public final class Preferences {
     public var notchIndicator: Bool {
         didSet { defaults.set(notchIndicator, forKey: Key.notchIndicator) }
     }
-    /// Music and videos pause while VibeFlow reads or listens, and play on afterwards.
+    /// Music and videos pause while Maagical reads or listens, and play on afterwards.
     public var pauseMedia: Bool {
         didSet { defaults.set(pauseMedia, forKey: Key.pauseMedia) }
     }

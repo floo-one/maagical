@@ -36,7 +36,7 @@ public final class ScribeTranscriber: FileTranscriber {
         let audio = try await AudioFileDecoder.audioOnly(file, info: info, directory: temporaryDirectory)
         defer { if audio != file { try? FileManager.default.removeItem(at: audio) } }
 
-        let boundary = "vibeflow-\(UUID().uuidString)"
+        let boundary = "maagical-\(UUID().uuidString)"
         let body = try Self.writeMultipart(fields: Self.fields(model: model, options: options, channels: info.channels),
                                            audio: audio, boundary: boundary, directory: temporaryDirectory)
         defer { try? FileManager.default.removeItem(at: body) }

@@ -2,7 +2,7 @@
 
 **Hear anything. Say anything.**
 
-[![CI](https://github.com/floo-one/vibeflow/actions/workflows/ci.yml/badge.svg)](https://github.com/floo-one/vibeflow/actions/workflows/ci.yml)
+[![CI](https://github.com/floo-one/maagical/actions/workflows/ci.yml/badge.svg)](https://github.com/floo-one/maagical/actions/workflows/ci.yml)
 
 A tiny Mac menu bar app for both directions of voice. Select text anywhere and press a
 shortcut to hear it in a natural voice. Hold another shortcut, talk, and your words are typed
@@ -13,7 +13,7 @@ You bring your own API keys.
 
 ## Install
 
-1. Download [Maagical.dmg](https://github.com/floo-one/vibeflow/releases/latest/download/Maagical.dmg)
+1. Download [Maagical.dmg](https://github.com/floo-one/maagical/releases/latest/download/Maagical.dmg)
    (signed and notarized by Apple), open it and drag Maagical to Applications.
 2. Grant Accessibility when asked, and Microphone on your first dictation.
 3. Add your keys in Settings > Accounts (see [Keys](#keys); all optional).

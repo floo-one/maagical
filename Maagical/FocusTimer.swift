@@ -51,7 +51,7 @@ final class FocusTimer {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.send(.tick) }
         }
-        send(.tick) // a phase that ran out while VibeFlow was quit
+        send(.tick) // a phase that ran out while Maagical was quit
         syncTicker()
     }
 

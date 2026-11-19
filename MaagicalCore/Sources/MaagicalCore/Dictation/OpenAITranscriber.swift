@@ -92,7 +92,7 @@ public final class OpenAITranscriber: Transcriber {
 
     static func buildRequest(audio: RecordedAudio, language: String?, model: String, baseURL: URL, apiKey: String?,
                              timeout: TimeInterval = OpenAITranscriber.timeout) -> URLRequest {
-        let boundary = "vibeflow-\(UUID().uuidString)"
+        let boundary = "maagical-\(UUID().uuidString)"
         var request = URLRequest(url: baseURL.appendingPathComponent("audio/transcriptions"))
         request.httpMethod = "POST"
         request.timeoutInterval = timeout
