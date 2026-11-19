@@ -10,7 +10,7 @@ settings, the VF Info.plist keys and vf-eval keep their two-letter prefix.
 Native macOS menu bar app: select text anywhere, press a global shortcut, hear it read
 aloud in a natural voice. v1 (shipped locally) is speech out; VibeFlow 2 adds FreeFlow-style
 dictation and a conversation mode (docs/designs/vibeflow-2-dictation-conversation.md).
-Default shortcuts: Option + . read, Option + , smart read (hold to ask a follow-up), Shift adds clipboard, Option + - push-to-talk
+Default shortcuts: Option + . read, Option + , smart read (hold to ask a follow-up), Shift adds clipboard (hold Shift + Option + , to ask about the clipboard), Option + - push-to-talk
 dictation, Shift + Option + - toggle dictation (the three keys right above Option, same physical keys on every layout:
 `,` `.` `-` on German, `,` `.` `/` on US; the dictation key is kVK_ANSI_Slash), Option + Command + V paste last dictation,
 Shift + Option + Command + V paste last smart read.
