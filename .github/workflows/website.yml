@@ -17,7 +17,7 @@ concurrency:
 
 env:
   # The custom domain; without these the site builds for floo-one.github.io/vibeflow/.
-  SITE_URL: https://vibeflow.floo.one
+  SITE_URL: https://maagical.app
   BASE_PATH: /
   ASTRO_TELEMETRY_DISABLED: 1
 
