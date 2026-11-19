@@ -241,6 +241,7 @@ enum PanelActions {
         case .dictation(.discard): return "Discard"
         case .dictation(.openDictationSettings): return "Open Settings > Dictation"
         case .dismissRenameNotice: return "OK"
+        case .moveToNewHome: return "Update Now"
         }
     }
 
@@ -270,6 +271,7 @@ enum PanelActions {
         case .dictation(.discard): container.dictation.discard()
         case .dictation(.openDictationSettings): container.presentSettings(tab: .dictation)
         case .dismissRenameNotice: container.dismissRenameNotice()
+        case .moveToNewHome: BridgeMove.shared.start()
         }
     }
 }

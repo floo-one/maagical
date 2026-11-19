@@ -4,7 +4,7 @@ import OSLog
 import Sentry
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "feedback")
+private let log = Logger(subsystem: "one.floo.maagical", category: "feedback")
 
 /// Sentry for Send Feedback and crash reports (docs/designs/feedback.md). Started once at
 /// launch, in Maagical Dev too (environment "dev", D11). Without a DSN in Info.plist (forks,
@@ -84,7 +84,7 @@ enum FeedbackSender {
             do {
                 let store = try OSLogStore(scope: .currentProcessIdentifier)
                 let since = store.position(date: Date().addingTimeInterval(-minutes * 60))
-                let entries = try store.getEntries(at: since, matching: NSPredicate(format: "subsystem == %@", "one.floo.vibeflow"))
+                let entries = try store.getEntries(at: since, matching: NSPredicate(format: "subsystem == %@", "one.floo.maagical"))
                 let time = Date.FormatStyle().hour(.twoDigits(amPM: .omitted)).minute(.twoDigits).second(.twoDigits)
                 let lines = entries.compactMap { entry -> String? in
                     guard let entry = entry as? OSLogEntryLog else { return nil }

@@ -7,8 +7,8 @@ import MaagicalCore
 /// by Maagical and Maagical Dev; the Google sign-in is per app, so signing out of Dev never
 /// signs out the release.
 final class KeychainSecretsStore: SecretsStore, @unchecked Sendable {
-    private let keychain = Keychain(service: "one.floo.vibeflow").accessibility(.whenUnlocked)
-    private let perApp = Keychain(service: (Bundle.main.bundleIdentifier ?? "one.floo.vibeflow") + ".google")
+    private let keychain = Keychain(service: AppIdentity.current.keychainService).accessibility(.whenUnlocked)
+    private let perApp = Keychain(service: (Bundle.main.bundleIdentifier ?? AppIdentity.bundleID) + ".google")
         .accessibility(.whenUnlocked)
     private let lock = NSLock()
     private var cache: [SecretKey: String] = [:]

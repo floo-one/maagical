@@ -4,7 +4,7 @@ import Foundation
 import OSLog
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "audio-in")
+private let log = Logger(subsystem: "one.floo.maagical", category: "audio-in")
 
 enum Microphone {
     /// Deep link to System Settings > Privacy & Security > Microphone.
@@ -72,8 +72,8 @@ final class LiveAudioRecorder: AudioRecorder {
 /// session block, so they run on `sessionQueue`, never on the main thread.
 private final class CaptureRecording: NSObject, AVCaptureAudioDataOutputSampleBufferDelegate, @unchecked Sendable {
     private let session = AVCaptureSession()
-    private let sessionQueue = DispatchQueue(label: "one.floo.vibeflow.audio-in.session")
-    private let sampleQueue = DispatchQueue(label: "one.floo.vibeflow.audio-in.samples")
+    private let sessionQueue = DispatchQueue(label: "one.floo.maagical.audio-in.session")
+    private let sampleQueue = DispatchQueue(label: "one.floo.maagical.audio-in.samples")
     private let lock = NSLock()
     private var pcm = Data()
     private var finished = false

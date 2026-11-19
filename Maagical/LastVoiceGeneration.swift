@@ -4,11 +4,11 @@ import MaagicalCore
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "last-generation")
+private let log = Logger(subsystem: "one.floo.maagical", category: "last-generation")
 
 /// The audio of the last ElevenLabs read or answer, as an .m4a people can save or share
 /// (the Last read row in the panel). One file, replaced by every new generation; it lives in
-/// ~/Library/Caches/VibeFlow and is not kept across launches.
+/// ~/Library/Caches/Maagical and is not kept across launches.
 @MainActor
 @Observable
 final class LastVoiceGeneration {
@@ -19,9 +19,9 @@ final class LastVoiceGeneration {
     @ObservationIgnored private var generation = 0
 
     #if DEBUG
-    static let folder = URL.cachesDirectory.appending(path: "VibeFlow/LastRead-dev")
+    static let folder = AppIdentity.current.cachesDirectory.appending(path: "LastRead-dev")
     #else
-    static let folder = URL.cachesDirectory.appending(path: "VibeFlow/LastRead")
+    static let folder = AppIdentity.current.cachesDirectory.appending(path: "LastRead")
     #endif
 
     init() {

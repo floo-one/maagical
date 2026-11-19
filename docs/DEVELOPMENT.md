@@ -7,8 +7,8 @@
 2. Sign in to Xcode with an Apple ID (Settings > Accounts). A free personal team is enough
    for Debug builds. It gives the app a stable signature, so the Accessibility and Microphone
    permissions survive rebuilds. In `project.yml`, set `DEVELOPMENT_TEAM` to your team id and
-   change `PRODUCT_BUNDLE_IDENTIFIER` (for example to `com.yourname.vibeflow`), since
-   `one.floo.vibeflow` belongs to the author's team.
+   change `PRODUCT_BUNDLE_IDENTIFIER` (for example to `com.yourname.maagical`), since
+   `one.floo.maagical` belongs to the author's team.
 3. Build and run:
 
    ```bash
@@ -141,11 +141,11 @@ To build a release locally:
 scripts/release.sh
 ```
 
-It archives the Release configuration (bundle id `one.floo.vibeflow`), exports it with
+It archives the Release configuration (bundle id `one.floo.maagical`), exports it with
 Developer ID (`scripts/ExportOptions.plist`), notarizes and staples the app, packs it into a
 DMG with an Applications shortcut, notarizes and staples the DMG as well, and finishes with a
 Gatekeeper check (`spctl`). It then signs the DMG with the Sparkle key and writes the update
-feed, `build/release/appcast.xml` (`scripts/write-appcast.sh`), after checking before the
+feed, `build/release/maagical-appcast.xml` (`scripts/write-appcast.sh`), after checking before the
 build that the key in the keychain matches `SUPublicEDKey`. The result is
 `build/release/Maagical-<version>.dmg`. The exported app is deleted at the end, since the DMG
 is the release and a second copy of Maagical could answer to its bundle id; the archive stays
@@ -161,10 +161,13 @@ To publish:
 
 By hand, on a clean, pushed main: `scripts/release.sh --publish`. It refuses to run anywhere else or with a build number that is not higher than the last
 tag's. It tags `v<version>` and creates the GitHub release with the changelog section as
-notes, the DMG as `Maagical.dmg` and the feed as `appcast.xml`. So the README download link
-always points at the newest version, and installed copies (which read
-`.../releases/latest/download/appcast.xml`) find it within 6 hours. Forks: change `teamID` in
-`scripts/ExportOptions.plist`, the team id in the commands above, and `SUFeedURL` and
+notes, the DMG as `Maagical.dmg` and the feed as `maagical-appcast.xml`. So the README
+download link always points at the newest version, and installed copies (which read
+`.../releases/latest/download/maagical-appcast.xml`) find it within 6 hours. Copies from
+before 1.6 run as `one.floo.vibeflow` and read `appcast.xml`: the first release under the new
+id also builds the bridge for them, and every later one carries its `appcast.xml` over
+(`docs/designs/bundle-id-move.md`). Forks: change `teamID` in
+`scripts/ExportOptions.plist`, the team id in the commands above, and `VF_FEED_URL` and
 `SUPublicEDKey` in `project.yml` to yours.
 
 ### Publishing from GitHub Actions
@@ -304,4 +307,5 @@ Every design, review decision and task list is in `docs/designs/`:
 - `smart-read-follow-up.md`: ask back
 - `vibeflow-github-v1.md`: this repository and its releases
 - `dev-prod-channels.md`: Maagical and Maagical Dev side by side, and updates
+- `bundle-id-move.md`: the move from one.floo.vibeflow to one.floo.maagical, and the bridge
 - `upcoming-meetings.md`: meetings in the menu bar (Google Calendar)

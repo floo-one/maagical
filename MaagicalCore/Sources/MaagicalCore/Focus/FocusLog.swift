@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "focus")
+private let log = Logger(subsystem: "one.floo.maagical", category: "focus")
 
 /// Everything the focus timer keeps: the running session and every completed block.
 public struct FocusFile: Codable, Equatable, Sendable {
@@ -28,10 +28,10 @@ public final class FocusLog {
         load()
     }
 
-    /// ~/Library/Application Support/VibeFlow/<name>; the app passes focus.json, or
+    /// ~/Library/Application Support/Maagical/<name>; the app passes focus.json, or
     /// focus-dev.json for Maagical Dev, which shares the folder.
     public static func defaultFileURL(named name: String) -> URL {
-        URL.applicationSupportDirectory.appending(path: "VibeFlow/\(name)")
+        AppIdentity.current.supportDirectory.appending(path: name)
     }
 
     /// Writes `next` and adopts it only if the write succeeded.

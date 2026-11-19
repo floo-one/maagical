@@ -95,7 +95,7 @@ With no keys at all you still get reading with an Apple voice, plus dictation on
 - **Crash reports**: if Maagical crashes or freezes, Sentry receives the stack trace, version
   and Mac model, with the same scrubbing and a random install id instead of your name. Like
   any web request, Sentry sees the IP address a report arrives from.
-- **Stays local**: History (`~/Library/Application Support/VibeFlow/history.json`, cleared in
+- **Stays local**: History (`~/Library/Application Support/Maagical/history.json`, cleared in
   Settings > General), recordings (in memory only; the last failed one is kept until the next
   dictation so you can retry it) and API keys (Keychain).
 

@@ -2,7 +2,7 @@ import Foundation
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "file-transcription")
+private let log = Logger(subsystem: "one.floo.maagical", category: "file-transcription")
 
 /// Transcribes one file at a time beside dictation (file transcription D2): picks the engine
 /// (D3), runs Groq pieces or a whole-file engine, handles failures (D6), saves the transcript,

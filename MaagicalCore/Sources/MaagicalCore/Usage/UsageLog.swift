@@ -2,7 +2,7 @@ import Foundation
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "usage")
+private let log = Logger(subsystem: "one.floo.maagical", category: "usage")
 
 /// One day's use of one model: request count, units and the estimated cost, priced when
 /// each request was made (a later price change does not rewrite the past).
@@ -144,9 +144,9 @@ public final class UsageLog {
         if prune() { save() }
     }
 
-    /// ~/Library/Application Support/VibeFlow/usage.json
+    /// ~/Library/Application Support/Maagical/usage.json
     public static var defaultFileURL: URL {
-        URL.applicationSupportDirectory.appending(path: "VibeFlow/usage.json")
+        AppIdentity.current.supportDirectory.appending(path: "usage.json")
     }
 
     /// Hands events from any thread to the log on the main actor; give it to the metered clients.

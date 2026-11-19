@@ -4,7 +4,7 @@ import Network
 import os
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "meetings")
+private let log = Logger(subsystem: "one.floo.maagical", category: "meetings")
 
 /// Why a Google sign-in did not finish, in the words the Meetings tab shows.
 enum GoogleSignInError: Error, Equatable {
@@ -78,7 +78,7 @@ final class GoogleSignIn {
 /// One-shot HTTP listener for the OAuth redirect. Everything runs on `queue`.
 private final class LoopbackListener: @unchecked Sendable {
     private let listener: NWListener
-    private let queue = DispatchQueue(label: "one.floo.vibeflow.google-sign-in")
+    private let queue = DispatchQueue(label: "one.floo.maagical.google-sign-in")
     private let expectedState: String
     private let timeout: Duration
     private var ready: CheckedContinuation<UInt16, Error>?

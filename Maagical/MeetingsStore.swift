@@ -5,7 +5,7 @@ import Observation
 import os
 import MaagicalCore
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "meetings")
+private let log = Logger(subsystem: "one.floo.maagical", category: "meetings")
 
 /// Upcoming meetings for the menu bar. Thin on purpose: it runs the sync triggers (every
 /// 5 minutes, wake, network back, settings change, sign-in), keeps one fetch in flight, and
@@ -67,7 +67,7 @@ final class MeetingsStore {
             }
             if cameBack { Task { @MainActor in self?.sync() } }
         }
-        pathMonitor.start(queue: DispatchQueue(label: "one.floo.vibeflow.meetings-network"))
+        pathMonitor.start(queue: DispatchQueue(label: "one.floo.maagical.meetings-network"))
     }
 
     /// What the menu bar item shows at `now` (M2).

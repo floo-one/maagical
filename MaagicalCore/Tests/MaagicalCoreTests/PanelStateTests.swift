@@ -20,6 +20,17 @@ struct PanelStateTests {
         #expect(PanelState(.init(readState: .speaking, readStatus: "Speaking", showsRenameNotice: true)).top.card?.title == "Speaking")
     }
 
+    @Test func bridgeOffersTheNewHomeAboveSetupButNotOverActivity() {
+        let card = PanelState(.init(accessibilityTrusted: false, offersNewHome: true)).top.card
+        #expect(card?.title == "Maagical has a new home")
+        #expect(card?.actions == [.moveToNewHome])
+        #expect(card?.actionsEnabled == true)
+        let moving = PanelState(.init(offersNewHome: true, newHomeStep: "Installing…")).top.card
+        #expect(moving?.detail == "Installing…")
+        #expect(moving?.actionsEnabled == false)
+        #expect(PanelState(.init(readState: .speaking, readStatus: "Speaking", offersNewHome: true)).top.card?.title == "Speaking")
+    }
+
     @Test func secureInputNamesTheAppBlockingTheShortcuts() {
         let card = PanelState(.init(microphoneDenied: true, shortcutsBlockedBy: "Google Chrome")).top.card
         #expect(card?.title == "Shortcuts are blocked")

@@ -3,7 +3,7 @@ import CoreGraphics
 import Observation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "shortcuts")
+private let log = Logger(subsystem: "one.floo.maagical", category: "shortcuts")
 
 /// Notices when another app holds secure keyboard input, which blocks every Maagical shortcut
 /// without a sound or an error. Apps turn it on while a password field has focus (Chrome can

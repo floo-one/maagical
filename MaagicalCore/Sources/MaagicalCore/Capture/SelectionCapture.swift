@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-private let log = Logger(subsystem: "one.floo.vibeflow", category: "capture")
+private let log = Logger(subsystem: "one.floo.maagical", category: "capture")
 
 /// Capture orchestrator (design: Capture steps 2 to 4). Trust is checked by the session.
 ///
